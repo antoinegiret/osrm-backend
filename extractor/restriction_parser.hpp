@@ -52,9 +52,11 @@ class RestrictionParser
     void ReadUseRestrictionsSetting(lua_State *lua_state);
     void ReadRestrictionExceptions(lua_State *lua_state);
     bool ShouldIgnoreRestriction(const std::string &except_tag_string) const;
+    bool ShouldIgnoreBicycleRestriction(const std::string &restriction_tag_string) const;
 
     // lua_State *lua_state;
     std::vector<std::string> restriction_exceptions;
+    std::vector<std::string> bicycle_restrictions_ignored;
     bool use_turn_restrictions;
 };
 
