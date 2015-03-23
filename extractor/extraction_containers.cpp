@@ -388,6 +388,10 @@ void ExtractionContainers::PrepareData(const std::string &output_file_name,
                 file_out_stream.write((char *)&travel_mode, sizeof(TravelMode));
 
                 file_out_stream.write((char *)&edge_iterator->is_split, sizeof(bool));
+                
+                const Facility facility = edge_iterator->facility;
+                file_out_stream.write((char *)&facility, sizeof(Facility));
+                
                 ++number_of_used_edges;
             }
             ++edge_iterator;

@@ -131,6 +131,7 @@ NodeID readBinaryOSRMGraphFromStream(std::istream &input_stream,
     short dir; // direction (0 = open, 1 = forward, 2+ = open)
     bool is_roundabout, ignore_in_grid, is_access_restricted, is_split;
     TravelMode travel_mode;
+    Facility facility;
 
     EdgeID m;
     input_stream.read((char *)&m, sizeof(unsigned));
@@ -150,6 +151,7 @@ NodeID readBinaryOSRMGraphFromStream(std::istream &input_stream,
         input_stream.read((char *)&is_access_restricted, sizeof(bool));
         input_stream.read((char *)&travel_mode, sizeof(TravelMode));
         input_stream.read((char *)&is_split, sizeof(bool));
+        input_stream.read((char *)&facility, sizeof(Facility));
 
         BOOST_ASSERT_MSG(length > 0, "loaded null length edge");
         BOOST_ASSERT_MSG(weight > 0, "loaded null weight");
@@ -204,7 +206,8 @@ NodeID readBinaryOSRMGraphFromStream(std::istream &input_stream,
                                ignore_in_grid,
                                is_access_restricted,
                                travel_mode,
-                               is_split);
+                               is_split,
+                               facility);
     }
     ext_to_int_id_map.clear();
 

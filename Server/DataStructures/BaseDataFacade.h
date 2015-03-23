@@ -93,6 +93,8 @@ template <class EdgeDataT> class BaseDataFacade
     virtual TurnInstruction GetTurnInstructionForEdgeID(const unsigned id) const = 0;
 
     virtual TravelMode GetTravelModeForEdgeID(const unsigned id) const = 0;
+    
+    virtual Facility GetFacilityForEdgeID(const unsigned id) const = 0;
 
     virtual bool LocateClosestEndPointForCoordinate(const FixedPointCoordinate &input_coordinate,
                                                     FixedPointCoordinate &result,

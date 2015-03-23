@@ -31,7 +31,8 @@ PhantomNode::PhantomNode(NodeID forward_node_id, NodeID reverse_node_id, unsigne
             int forward_weight, int reverse_weight, int forward_offset, int reverse_offset,
             unsigned packed_geometry_id, unsigned component_id, FixedPointCoordinate &location,
             unsigned short fwd_segment_position,
-            TravelMode forward_travel_mode, TravelMode backward_travel_mode) :
+            TravelMode forward_travel_mode, TravelMode backward_travel_mode,
+            Facility forward_facility, Facility backward_facility) :
     forward_node_id(forward_node_id),
     reverse_node_id(reverse_node_id),
     name_id(name_id),
@@ -44,7 +45,9 @@ PhantomNode::PhantomNode(NodeID forward_node_id, NodeID reverse_node_id, unsigne
     location(location),
     fwd_segment_position(fwd_segment_position),
     forward_travel_mode(forward_travel_mode),
-    backward_travel_mode(backward_travel_mode)
+    backward_travel_mode(backward_travel_mode),
+    forward_facility(forward_facility),
+    backward_facility(backward_facility)
 { }
 
 PhantomNode::PhantomNode() :
@@ -59,7 +62,9 @@ PhantomNode::PhantomNode() :
     component_id(-1),
     fwd_segment_position(0),
     forward_travel_mode(TRAVEL_MODE_INACCESSIBLE),
-    backward_travel_mode(TRAVEL_MODE_INACCESSIBLE)
+    backward_travel_mode(TRAVEL_MODE_INACCESSIBLE),
+    forward_facility(FACILITY_FORBIDDEN),
+    backward_facility(FACILITY_FORBIDDEN)
 { }
 
 int PhantomNode::GetForwardWeightPlusOffset() const

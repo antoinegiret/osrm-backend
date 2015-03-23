@@ -31,6 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "turn_instructions.hpp"
 
 #include "../data_structures/travel_mode.hpp"
+#include "../data_structures/facility.hpp"
 #include "../typedefs.h"
 
 #include <osrm/Coordinate.h>
@@ -45,6 +46,7 @@ struct SegmentInformation
     short bearing; // more than enough [0..3600] fits into 12 bits
     TurnInstruction turn_instruction;
     TravelMode travel_mode;
+    Facility facility;
     bool necessary;
     bool is_via_location;
 
@@ -55,10 +57,11 @@ struct SegmentInformation
                                 const TurnInstruction turn_instruction,
                                 const bool necessary,
                                 const bool is_via_location,
-                                const TravelMode travel_mode)
+                                const TravelMode travel_mode,
+                                const Facility facility)
         : location(location), name_id(name_id), duration(duration), length(length), bearing(0),
-          turn_instruction(turn_instruction), travel_mode(travel_mode), necessary(necessary),
-          is_via_location(is_via_location)
+          turn_instruction(turn_instruction), travel_mode(travel_mode), facility(facility),
+          necessary(necessary), is_via_location(is_via_location)
     {
     }
 
@@ -67,9 +70,10 @@ struct SegmentInformation
                                 const EdgeWeight duration,
                                 const float length,
                                 const TurnInstruction turn_instruction,
-                                const TravelMode travel_mode)
+                                const TravelMode travel_mode,
+                                const Facility facility)
         : location(location), name_id(name_id), duration(duration), length(length), bearing(0),
-          turn_instruction(turn_instruction), travel_mode(travel_mode),
+          turn_instruction(turn_instruction), travel_mode(travel_mode), facility(facility),
           necessary(turn_instruction != TurnInstruction::NoTurn), is_via_location(false)
     {
     }

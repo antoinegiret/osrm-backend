@@ -127,7 +127,8 @@ void ExtractorCallbacks::ProcessWay(const osmium::Way &input_way, const Extracti
                             (parsed_way.backward_speed > 0) &&
                             (TRAVEL_MODE_INACCESSIBLE != parsed_way.backward_travel_mode) &&
                             ((parsed_way.forward_speed != parsed_way.backward_speed) ||
-                             (parsed_way.forward_travel_mode != parsed_way.backward_travel_mode));
+                             (parsed_way.forward_travel_mode != parsed_way.backward_travel_mode) ||
+                             (parsed_way.forward_facility != parsed_way.backward_facility));
 
     auto pair_wise_segment_split = [&](const osmium::NodeRef &first_node,
                                        const osmium::NodeRef &last_node)
@@ -147,7 +148,8 @@ void ExtractorCallbacks::ProcessWay(const osmium::Way &input_way, const Extracti
             (0 < parsed_way.duration),
             parsed_way.is_access_restricted,
             parsed_way.forward_travel_mode,
-            split_edge));
+            split_edge,
+            parsed_way.forward_facility));
         external_memory.used_node_id_list.push_back(first_node.ref());
     };
 
@@ -194,7 +196,8 @@ void ExtractorCallbacks::ProcessWay(const osmium::Way &input_way, const Extracti
                                       (0 < parsed_way.duration),
                                       parsed_way.is_access_restricted,
                                       parsed_way.backward_travel_mode,
-                                      split_edge));
+                                      split_edge,
+                                      parsed_way.backward_facility));
         };
 
         if (is_opposite_way)

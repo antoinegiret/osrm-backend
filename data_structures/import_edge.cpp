@@ -56,10 +56,11 @@ NodeBasedEdge::NodeBasedEdge(NodeID source,
                              bool in_tiny_cc,
                              bool access_restricted,
                              TravelMode travel_mode,
-                             bool is_split)
+                             bool is_split,
+                             Facility facility)
     : source(source), target(target), name_id(name_id), weight(weight),
       forward(forward), backward(backward), roundabout(roundabout), in_tiny_cc(in_tiny_cc),
-      access_restricted(access_restricted), is_split(is_split), travel_mode(travel_mode)
+      access_restricted(access_restricted), is_split(is_split), travel_mode(travel_mode), facility(facility)
 {
 }
 

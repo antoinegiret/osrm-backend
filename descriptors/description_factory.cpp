@@ -45,9 +45,11 @@ void DescriptionFactory::SetStartSegment(const PhantomNode &source, const bool t
         (traversed_in_reverse ? source.reverse_weight : source.forward_weight);
     const TravelMode travel_mode =
         (traversed_in_reverse ? source.backward_travel_mode : source.forward_travel_mode);
+	const Facility facility =
+        (traversed_in_reverse ? source.backward_facility : source.forward_facility);
     AppendSegment(
         source.location,
-        PathData(0, source.name_id, TurnInstruction::HeadOn, segment_duration, travel_mode));
+        PathData(0, source.name_id, TurnInstruction::HeadOn, segment_duration, travel_mode, facility));
     BOOST_ASSERT(path_description.back().duration == segment_duration);
 }
 
@@ -60,6 +62,8 @@ void DescriptionFactory::SetEndSegment(const PhantomNode &target,
         (traversed_in_reverse ? target.reverse_weight : target.forward_weight);
     const TravelMode travel_mode =
         (traversed_in_reverse ? target.backward_travel_mode : target.forward_travel_mode);
+	const Facility facility =
+        (traversed_in_reverse ? target.backward_facility : target.forward_facility);
     path_description.emplace_back(target.location,
                                   target.name_id,
                                   segment_duration,
@@ -68,7 +72,8 @@ void DescriptionFactory::SetEndSegment(const PhantomNode &target,
                                                   : TurnInstruction::NoTurn,
                                   true,
                                   true,
-                                  travel_mode);
+                                  travel_mode,
+                                  facility);
     BOOST_ASSERT(path_description.back().duration == segment_duration);
 }
 
@@ -87,12 +92,15 @@ void DescriptionFactory::AppendSegment(const FixedPointCoordinate &coordinate,
         return;
     }
 
-    // make sure mode changes are announced, even when there otherwise is no turn
+    // make sure mode and facility changes are announced, even when there otherwise is no turn
     const TurnInstruction turn = [&]() -> TurnInstruction
     {
-        if (TurnInstruction::NoTurn == path_point.turn_instruction &&
+        if ((TurnInstruction::NoTurn == path_point.turn_instruction &&
             path_description.front().travel_mode != path_point.travel_mode &&
-            path_point.segment_duration > 0)
+            path_point.segment_duration > 0) ||
+            (TurnInstruction::NoTurn == path_point.turn_instruction &&
+            path_description.front().facility != path_point.facility &&
+            path_point.segment_duration > 0))
         {
             return TurnInstruction::GoStraight;
         }
@@ -104,7 +112,8 @@ void DescriptionFactory::AppendSegment(const FixedPointCoordinate &coordinate,
                                   path_point.segment_duration,
                                   0.f,
                                   turn,
-                                  path_point.travel_mode);
+                                  path_point.travel_mode,
+                                  path_point.facility);
 }
 
 JSON::Value DescriptionFactory::AppendGeometryString(const bool return_encoded)

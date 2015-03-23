@@ -51,6 +51,7 @@ struct SharedDataLayout
         COORDINATE_LIST,
         TURN_INSTRUCTION,
         TRAVEL_MODE,
+        FACILITY,
         R_SEARCH_TREE,
         GEOMETRIES_INDEX,
         GEOMETRIES_LIST,
@@ -84,6 +85,7 @@ struct SharedDataLayout
         SimpleLogger().Write(logDEBUG) << "coordinate_list_size:       " << num_entries[COORDINATE_LIST];
         SimpleLogger().Write(logDEBUG) << "turn_instruction_list_size: " << num_entries[TURN_INSTRUCTION];
         SimpleLogger().Write(logDEBUG) << "travel_mode_list_size:      " << num_entries[TRAVEL_MODE];
+        SimpleLogger().Write(logDEBUG) << "facility_list_size:         " << num_entries[FACILITY];
         SimpleLogger().Write(logDEBUG) << "r_search_tree_size:         " << num_entries[R_SEARCH_TREE];
         SimpleLogger().Write(logDEBUG) << "geometries_indicators:      " << num_entries[GEOMETRIES_INDICATORS]
                                        << "/" << ((num_entries[GEOMETRIES_INDICATORS] / 8) + 1);
@@ -101,6 +103,7 @@ struct SharedDataLayout
         SimpleLogger().Write(logDEBUG) << "COORDINATE_LIST      " << ": " << GetBlockSize(COORDINATE_LIST      );
         SimpleLogger().Write(logDEBUG) << "TURN_INSTRUCTION     " << ": " << GetBlockSize(TURN_INSTRUCTION     );
         SimpleLogger().Write(logDEBUG) << "TRAVEL_MODE          " << ": " << GetBlockSize(TRAVEL_MODE          );
+        SimpleLogger().Write(logDEBUG) << "FACILITY             " << ": " << GetBlockSize(FACILITY             );
         SimpleLogger().Write(logDEBUG) << "R_SEARCH_TREE        " << ": " << GetBlockSize(R_SEARCH_TREE        );
         SimpleLogger().Write(logDEBUG) << "GEOMETRIES_INDEX     " << ": " << GetBlockSize(GEOMETRIES_INDEX     );
         SimpleLogger().Write(logDEBUG) << "GEOMETRIES_LIST      " << ": " << GetBlockSize(GEOMETRIES_LIST      );

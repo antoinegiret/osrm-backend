@@ -29,6 +29,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define EXTRACTION_WAY_HPP
 
 #include "../data_structures/travel_mode.hpp"
+#include "../data_structures/facility.hpp"
 #include "../typedefs.h"
 
 #include <string>
@@ -49,6 +50,8 @@ struct ExtractionWay
         name.clear();
         forward_travel_mode = TRAVEL_MODE_DEFAULT;
         backward_travel_mode = TRAVEL_MODE_DEFAULT;
+        forward_facility = FACILITY_NONE;
+        backward_facility = FACILITY_NONE;
     }
 
     enum Directions
@@ -105,6 +108,11 @@ struct ExtractionWay
     TravelMode get_forward_mode() const { return forward_travel_mode; }
     void set_backward_mode(const TravelMode m) { backward_travel_mode = m; }
     TravelMode get_backward_mode() const { return backward_travel_mode; }
+    
+    void set_forward_facility(const Facility f) { forward_facility = f; }
+    Facility get_forward_facility() const { return forward_facility; }
+    void set_backward_facility(const Facility f) { backward_facility = f; }
+    Facility get_backward_facility() const { return backward_facility; }
 
     double forward_speed;
     double backward_speed;
@@ -115,6 +123,8 @@ struct ExtractionWay
     bool ignore_in_grid;
     TravelMode forward_travel_mode : 4;
     TravelMode backward_travel_mode : 4;
+    Facility forward_facility;
+    Facility backward_facility;
 };
 
 #endif // EXTRACTION_WAY_HPP

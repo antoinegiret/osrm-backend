@@ -30,6 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <osrm/Coordinate.h>
 #include "../data_structures/travel_mode.hpp"
+#include "../data_structures/facility.hpp"
 #include "../typedefs.h"
 
 #include <iostream>
@@ -49,7 +50,9 @@ struct PhantomNode
                 FixedPointCoordinate &location,
                 unsigned short fwd_segment_position,
                 TravelMode forward_travel_mode,
-                TravelMode backward_travel_mode);
+                TravelMode backward_travel_mode,
+                Facility forward_facility,
+                Facility backward_facility);
 
     PhantomNode();
 
@@ -66,6 +69,8 @@ struct PhantomNode
     unsigned short fwd_segment_position;
     TravelMode forward_travel_mode : 4;
     TravelMode backward_travel_mode : 4;
+    Facility forward_facility;
+	Facility backward_facility;
 
     int GetForwardWeightPlusOffset() const;
 

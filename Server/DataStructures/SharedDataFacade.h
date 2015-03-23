@@ -78,6 +78,7 @@ template <class EdgeDataT> class SharedDataFacade : public BaseDataFacade<EdgeDa
     ShM<unsigned, true>::vector m_name_ID_list;
     ShM<TurnInstruction, true>::vector m_turn_instruction_list;
     ShM<TravelMode, true>::vector m_travel_mode_list;
+    ShM<Facility, true>::vector m_facility_list;
     ShM<char, true>::vector m_names_char_list;
     ShM<unsigned, true>::vector m_name_begin_indices;
     ShM<bool, true>::vector m_edge_is_compressed;
@@ -149,6 +150,13 @@ template <class EdgeDataT> class SharedDataFacade : public BaseDataFacade<EdgeDa
             travel_mode_list_ptr,
             data_layout->num_entries[SharedDataLayout::TRAVEL_MODE]);
         m_travel_mode_list.swap(travel_mode_list);
+        
+        Facility *facility_list_ptr = data_layout->GetBlockPtr<Facility>(
+            shared_memory, SharedDataLayout::FACILITY);
+        typename ShM<Facility, true>::vector facility_list(
+            facility_list_ptr,
+            data_layout->num_entries[SharedDataLayout::FACILITY]);
+        m_facility_list.swap(facility_list);
 
         TurnInstruction *turn_instruction_list_ptr = data_layout->GetBlockPtr<TurnInstruction>(
             shared_memory, SharedDataLayout::TURN_INSTRUCTION);
@@ -354,6 +362,11 @@ template <class EdgeDataT> class SharedDataFacade : public BaseDataFacade<EdgeDa
     TravelMode GetTravelModeForEdgeID(const unsigned id) const
     {
         return m_travel_mode_list.at(id);
+    }
+    
+    Facility GetFacilityForEdgeID(const unsigned id) const
+    {
+        return m_facility_list.at(id);
     }
 
     bool LocateClosestEndPointForCoordinate(const FixedPointCoordinate &input_coordinate,

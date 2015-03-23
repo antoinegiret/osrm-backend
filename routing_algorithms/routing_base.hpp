@@ -227,7 +227,7 @@ template <class DataFacadeT> class BasicRoutingInterface
                 unsigned name_index = facade->GetNameIndexFromEdgeID(ed.id);
                 const TurnInstruction turn_instruction = facade->GetTurnInstructionForEdgeID(ed.id);
                 const TravelMode travel_mode = facade->GetTravelModeForEdgeID(ed.id);
-
+                const Facility facility = facade->GetFacilityForEdgeID(ed.id);
 
                 if (!facade->EdgeIsCompressed(ed.id))
                 {
@@ -236,7 +236,8 @@ template <class DataFacadeT> class BasicRoutingInterface
                                                name_index,
                                                turn_instruction,
                                                ed.distance,
-                                               travel_mode);
+                                               travel_mode,
+                                               facility);
                 }
                 else
                 {
@@ -257,7 +258,7 @@ template <class DataFacadeT> class BasicRoutingInterface
                     BOOST_ASSERT(start_index <= end_index);
                     for (std::size_t i = start_index; i < end_index; ++i)
                     {
-                        unpacked_path.emplace_back(id_vector[i], name_index, TurnInstruction::NoTurn, 0, travel_mode);
+                        unpacked_path.emplace_back(id_vector[i], name_index, TurnInstruction::NoTurn, 0, travel_mode, facility);
                     }
                     unpacked_path.back().turn_instruction = turn_instruction;
                     unpacked_path.back().segment_duration = ed.distance;
@@ -305,7 +306,8 @@ template <class DataFacadeT> class BasicRoutingInterface
                                                     phantom_node_pair.target_phantom.name_id,
                                                     TurnInstruction::NoTurn,
                                                     0,
-                                                    phantom_node_pair.target_phantom.forward_travel_mode});
+                                                    phantom_node_pair.target_phantom.forward_travel_mode,
+                                                    phantom_node_pair.target_phantom.forward_facility});
             }
         }
 

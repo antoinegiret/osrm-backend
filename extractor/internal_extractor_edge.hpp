@@ -30,6 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "../typedefs.h"
 #include "../data_structures/travel_mode.hpp"
+#include "../data_structures/facility.hpp"
 #include <osrm/Coordinate.h>
 
 #include <boost/assert.hpp>
@@ -39,7 +40,7 @@ struct InternalExtractorEdge
     InternalExtractorEdge()
         : start(0), target(0), direction(0), speed(0), name_id(0), is_roundabout(false),
           is_in_tiny_cc(false), is_duration_set(false), is_access_restricted(false),
-          travel_mode(TRAVEL_MODE_INACCESSIBLE), is_split(false)
+          travel_mode(TRAVEL_MODE_INACCESSIBLE), is_split(false), facility(FACILITY_FORBIDDEN)
     {
     }
 
@@ -53,23 +54,24 @@ struct InternalExtractorEdge
                                    bool is_duration_set,
                                    bool is_access_restricted,
                                    TravelMode travel_mode,
-                                   bool is_split)
+                                   bool is_split,
+                                   Facility facility)
         : start(start), target(target), direction(direction), speed(speed),
           name_id(name_id), is_roundabout(is_roundabout), is_in_tiny_cc(is_in_tiny_cc),
           is_duration_set(is_duration_set), is_access_restricted(is_access_restricted),
-          travel_mode(travel_mode), is_split(is_split)
+          travel_mode(travel_mode), is_split(is_split), facility(facility)
     {
     }
 
     // necessary static util functions for stxxl's sorting
     static InternalExtractorEdge min_value()
     {
-        return InternalExtractorEdge(0, 0, 0, 0, 0, false, false, false, false, TRAVEL_MODE_INACCESSIBLE, false);
+        return InternalExtractorEdge(0, 0, 0, 0, 0, false, false, false, false, TRAVEL_MODE_INACCESSIBLE, false, FACILITY_FORBIDDEN);
     }
     static InternalExtractorEdge max_value()
     {
         return InternalExtractorEdge(
-            SPECIAL_NODEID, SPECIAL_NODEID, 0, 0, 0, false, false, false, false, TRAVEL_MODE_INACCESSIBLE, false);
+            SPECIAL_NODEID, SPECIAL_NODEID, 0, 0, 0, false, false, false, false, TRAVEL_MODE_INACCESSIBLE, false, FACILITY_FORBIDDEN);
     }
 
     NodeID start;
@@ -83,6 +85,7 @@ struct InternalExtractorEdge
     bool is_access_restricted;
     TravelMode travel_mode : 4;
     bool is_split;
+    Facility facility;
 
     FixedPointCoordinate source_coordinate;
     FixedPointCoordinate target_coordinate;

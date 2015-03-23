@@ -29,6 +29,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define ORIGINAL_EDGE_DATA_HPP
 
 #include "travel_mode.hpp"
+#include "facility.hpp"
 #include "turn_instructions.hpp"
 #include "../typedefs.h"
 
@@ -40,9 +41,10 @@ struct OriginalEdgeData
                               unsigned name_id,
                               TurnInstruction turn_instruction,
                               bool compressed_geometry,
-                              TravelMode travel_mode)
+                              TravelMode travel_mode,
+                              Facility facility)
         : via_node(via_node), name_id(name_id), turn_instruction(turn_instruction),
-          compressed_geometry(compressed_geometry), travel_mode(travel_mode)
+          compressed_geometry(compressed_geometry), travel_mode(travel_mode), facility(facility)
     {
     }
 
@@ -50,7 +52,8 @@ struct OriginalEdgeData
         : via_node(std::numeric_limits<unsigned>::max()),
           name_id(std::numeric_limits<unsigned>::max()),
           turn_instruction(TurnInstruction::NoTurn), compressed_geometry(false),
-          travel_mode(TRAVEL_MODE_INACCESSIBLE)
+          travel_mode(TRAVEL_MODE_INACCESSIBLE),
+          facility(FACILITY_FORBIDDEN)
     {
     }
 
@@ -59,6 +62,7 @@ struct OriginalEdgeData
     TurnInstruction turn_instruction;
     bool compressed_geometry;
     TravelMode travel_mode;
+    Facility facility;
 };
 
 #endif // ORIGINAL_EDGE_DATA_HPP

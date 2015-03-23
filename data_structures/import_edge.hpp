@@ -29,6 +29,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define IMPORT_EDGE_HPP
 
 #include "../data_structures/travel_mode.hpp"
+#include "../data_structures/facility.hpp"
 #include "../typedefs.h"
 
 struct NodeBasedEdge
@@ -45,7 +46,8 @@ struct NodeBasedEdge
                            bool in_tiny_cc,
                            bool access_restricted,
                            TravelMode travel_mode,
-                           bool is_split);
+                           bool is_split,
+                           Facility facility);
 
     NodeID source;
     NodeID target;
@@ -58,6 +60,7 @@ struct NodeBasedEdge
     bool access_restricted : 1;
     bool is_split : 1;
     TravelMode travel_mode : 4;
+    Facility facility;
 
     NodeBasedEdge() = delete;
 };

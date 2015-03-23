@@ -358,6 +358,7 @@ template <class DataFacadeT> class JSONDescriptor final : public BaseDescriptor<
                     json_instruction_row.values.push_back(
                         static_cast<unsigned>(round(bearing_value)));
                     json_instruction_row.values.push_back(segment.travel_mode);
+                    json_instruction_row.values.push_back(segment.facility);
 
                     route_segments_list.emplace_back(
                         segment.name_id,

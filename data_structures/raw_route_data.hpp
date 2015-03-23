@@ -30,6 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "../data_structures/phantom_node.hpp"
 #include "../data_structures/travel_mode.hpp"
+#include "../data_structures/facility.hpp"
 #include "../data_structures/turn_instructions.hpp"
 #include "../typedefs.h"
 
@@ -43,7 +44,8 @@ struct PathData
         : node(SPECIAL_NODEID), name_id(INVALID_EDGE_WEIGHT),
           segment_duration(INVALID_EDGE_WEIGHT),
           turn_instruction(TurnInstruction::NoTurn),
-          travel_mode(TRAVEL_MODE_INACCESSIBLE)
+          travel_mode(TRAVEL_MODE_INACCESSIBLE),
+          facility(FACILITY_FORBIDDEN)
     {
     }
 
@@ -51,9 +53,10 @@ struct PathData
              unsigned name_id,
              TurnInstruction turn_instruction,
              EdgeWeight segment_duration,
-             TravelMode travel_mode)
+             TravelMode travel_mode,
+             Facility facility)
         : node(node), name_id(name_id), segment_duration(segment_duration), turn_instruction(turn_instruction),
-          travel_mode(travel_mode)
+          travel_mode(travel_mode), facility(facility)
     {
     }
     NodeID node;
@@ -61,6 +64,7 @@ struct PathData
     EdgeWeight segment_duration;
     TurnInstruction turn_instruction;
     TravelMode travel_mode : 4;
+    Facility facility;
 };
 
 struct RawRouteData

@@ -29,6 +29,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define EDGE_BASED_NODE_HPP
 
 #include "../data_structures/travel_mode.hpp"
+#include "../data_structures/facility.hpp"
 #include "../typedefs.h"
 
 #include <osrm/Coordinate.h>
@@ -53,7 +54,9 @@ struct EdgeBasedNode
         component_id(-1),
         fwd_segment_position( std::numeric_limits<unsigned short>::max() ),
         forward_travel_mode(TRAVEL_MODE_INACCESSIBLE),
-        backward_travel_mode(TRAVEL_MODE_INACCESSIBLE)
+        backward_travel_mode(TRAVEL_MODE_INACCESSIBLE),
+        forward_facility(FACILITY_FORBIDDEN),
+        backward_facility(FACILITY_FORBIDDEN)
     { }
 
     explicit EdgeBasedNode(
@@ -70,7 +73,9 @@ struct EdgeBasedNode
         unsigned component_id,
         unsigned short fwd_segment_position,
         TravelMode forward_travel_mode,
-        TravelMode backward_travel_mode
+        TravelMode backward_travel_mode,
+        Facility forward_facility,
+        Facility backward_facility
     ) :
         forward_edge_based_node_id(forward_edge_based_node_id),
         reverse_edge_based_node_id(reverse_edge_based_node_id),
@@ -85,7 +90,9 @@ struct EdgeBasedNode
         component_id(component_id),
         fwd_segment_position(fwd_segment_position),
         forward_travel_mode(forward_travel_mode),
-        backward_travel_mode(backward_travel_mode)
+        backward_travel_mode(backward_travel_mode),
+        forward_facility(forward_facility),
+        backward_facility(backward_facility)
     {
         BOOST_ASSERT((forward_edge_based_node_id != SPECIAL_NODEID) ||
                      (reverse_edge_based_node_id != SPECIAL_NODEID));
@@ -124,6 +131,8 @@ struct EdgeBasedNode
     unsigned short fwd_segment_position; // segment id in a compressed geometry
     TravelMode forward_travel_mode : 4;
     TravelMode backward_travel_mode : 4;
+    Facility forward_facility;
+    Facility backward_facility;
 };
 
 #endif //EDGE_BASED_NODE_HPP

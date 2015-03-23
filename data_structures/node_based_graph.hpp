@@ -42,7 +42,7 @@ struct NodeBasedEdgeData
         : distance(INVALID_EDGE_WEIGHT), edgeBasedNodeID(SPECIAL_NODEID),
           nameID(std::numeric_limits<unsigned>::max()),
           isAccessRestricted(false), shortcut(false), forward(false), backward(false),
-          roundabout(false), ignore_in_grid(false), travel_mode(TRAVEL_MODE_INACCESSIBLE)
+          roundabout(false), ignore_in_grid(false), travel_mode(TRAVEL_MODE_INACCESSIBLE), facility(FACILITY_FORBIDDEN)
     {
     }
 
@@ -56,6 +56,7 @@ struct NodeBasedEdgeData
     bool roundabout : 1;
     bool ignore_in_grid : 1;
     TravelMode travel_mode : 4;
+    Facility facility;
 
     void SwapDirectionFlags()
     {
@@ -119,6 +120,7 @@ NodeBasedDynamicGraphFromImportEdges(int number_of_nodes, std::vector<ImportEdge
         edge.data.nameID = import_edge.name_id;
         edge.data.isAccessRestricted = import_edge.access_restricted;
         edge.data.travel_mode = import_edge.travel_mode;
+        edge.data.facility = import_edge.facility;
 
         edges_list.push_back(edge);
 
