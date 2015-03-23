@@ -40,9 +40,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <vector>
 
-const double VIAPATH_ALPHA = 0.10;
-const double VIAPATH_EPSILON = 0.15; // alternative at most 15% longer
-const double VIAPATH_GAMMA = 0.75;   // alternative shares at most 75% with the shortest.
+const double VIAPATH_ALPHA = 0.20;
+const double VIAPATH_EPSILON = 0.30; // alternative at most 15% longer
+const double VIAPATH_GAMMA = 0.50;   // alternative shares at most 75% with the shortest.
 
 template <class DataFacadeT> class AlternativeRouting final : private BasicRoutingInterface<DataFacadeT>
 {
