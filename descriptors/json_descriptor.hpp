@@ -163,7 +163,13 @@ template <class DataFacadeT> class JSONDescriptor final : public BaseDescriptor<
         JSON::Object json_route_summary;
         json_route_summary.values["total_distance"] = description_factory.summary.distance;
         json_route_summary.values["total_time"] = description_factory.summary.duration;
-        json_route_summary.values["vertical_gain"] = 0.0;
+        
+        double vertical_gain = 0.0;
+		BuildVerticalGain(description_factory,
+						  vertical_gain,
+						  raw_route.segment_end_coordinates.back().target_phantom.location.ele / COORDINATE_PRECISION);
+		json_route_summary.values["vertical_gain"] = vertical_gain;
+        
         json_route_summary.values["start_point"] =
             facade->GetEscapedNameForNameID(description_factory.summary.source_name_id);
         json_route_summary.values["end_point"] =
@@ -262,7 +268,13 @@ template <class DataFacadeT> class JSONDescriptor final : public BaseDescriptor<
                 alternate_description_factory.summary.distance;
             json_alternate_route_summary.values["total_time"] =
                 alternate_description_factory.summary.duration;
-			json_alternate_route_summary.values["vertical_gain"] = 0.0;
+			
+			double alternate_vertical_gain = 0.0;
+			BuildVerticalGain(alternate_description_factory,
+                              alternate_vertical_gain,
+                              raw_route.segment_end_coordinates.back().target_phantom.location.ele / COORDINATE_PRECISION);
+			json_alternate_route_summary.values["vertical_gain"] = alternate_vertical_gain;
+            
             json_alternate_route_summary.values["start_point"] = facade->GetEscapedNameForNameID(
                 alternate_description_factory.summary.source_name_id);
             json_alternate_route_summary.values["end_point"] = facade->GetEscapedNameForNameID(
@@ -447,6 +459,30 @@ template <class DataFacadeT> class JSONDescriptor final : public BaseDescriptor<
 		json_last_elevation_row.values.push_back(true);
 		json_last_elevation_row.values.push_back(necessary_segments_running_index - 1);
 		json_route_elevations.values.push_back(json_last_elevation_row);
+	}
+	
+	inline void BuildVerticalGain(DescriptionFactory &description_factory,
+                                  double &vertical_gain,
+                                  const double target_ele) {
+	
+		double previous_ele = description_factory.path_description.front().location.ele / COORDINATE_PRECISION;
+		
+		for (const SegmentInformation &segment : description_factory.path_description)
+		{
+			const double current_ele = segment.location.ele / COORDINATE_PRECISION;
+			const double diff_ele = current_ele - previous_ele;
+			if(diff_ele > 0.0)
+			{
+				vertical_gain += diff_ele;
+			}
+			previous_ele = current_ele;
+		}
+		
+		const double last_diff_ele = target_ele - previous_ele;
+		if(last_diff_ele > 0.0)
+		{
+			vertical_gain += last_diff_ele;
+		}
 	}
 };
 
