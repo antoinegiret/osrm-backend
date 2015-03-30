@@ -30,6 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "extraction_way.hpp"
 #include "../typedefs.h"
+#include "../Include/osrm/Coordinate.h"
 
 #include <osmium/osm.hpp>
 
@@ -47,13 +48,15 @@ class ExtractorCallbacks
 {
   private:
     std::unordered_map<std::string, NodeID> &string_map;
+    std::unordered_map<NodeID, FixedPointCoordinate> &coordinates_map;
     ExtractionContainers &external_memory;
 
   public:
     ExtractorCallbacks() = delete;
     ExtractorCallbacks(const ExtractorCallbacks &) = delete;
     explicit ExtractorCallbacks(ExtractionContainers &extraction_containers,
-                                std::unordered_map<std::string, NodeID> &string_map);
+                                std::unordered_map<std::string, NodeID> &string_map,
+                                std::unordered_map<NodeID, FixedPointCoordinate> &coordinates_map);
 
     // warning: caller needs to take care of synchronization!
     void ProcessNode(const osmium::Node &current_node, const ExtractionNode &result_node);
@@ -63,6 +66,8 @@ class ExtractorCallbacks
 
     // warning: caller needs to take care of synchronization!
     void ProcessWay(const osmium::Way &current_way, const ExtractionWay &result_way);
+    
+    double GetSlopeRatio(const osmium::NodeRef &first_node, const osmium::NodeRef &last_node);
 };
 
 #endif /* EXTRACTOR_CALLBACKS_HPP */

@@ -82,15 +82,17 @@ PolylineCompressor::get_encoded_string(const std::vector<SegmentInformation> &po
 
     std::vector<int> delta_numbers;
     delta_numbers.reserve((polyline.size() - 1) * 2);
-    FixedPointCoordinate previous_coordinate = {0, 0};
+    FixedPointCoordinate previous_coordinate = {0, 0, 0};
     for (const auto &segment : polyline)
     {
         if (segment.necessary)
         {
             const int lat_diff = segment.location.lat - previous_coordinate.lat;
             const int lon_diff = segment.location.lon - previous_coordinate.lon;
+            const int ele_diff = segment.location.ele - previous_coordinate.ele;
             delta_numbers.emplace_back(lat_diff);
             delta_numbers.emplace_back(lon_diff);
+            delta_numbers.emplace_back(ele_diff / 10000);
             previous_coordinate = segment.location;
         }
     }

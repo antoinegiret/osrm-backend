@@ -40,12 +40,14 @@ struct FixedPointCoordinate
 {
     int lat;
     int lon;
+    int ele;
 
     FixedPointCoordinate();
     FixedPointCoordinate(int lat, int lon);
+    FixedPointCoordinate(int lat, int lon, int ele);
 
     template<class T>
-    FixedPointCoordinate(const T &coordinate) : lat(coordinate.lat), lon(coordinate.lon)
+    FixedPointCoordinate(const T &coordinate) : lat(coordinate.lat), lon(coordinate.lon), ele(coordinate.ele)
     {
         static_assert(std::is_same<decltype(lat), decltype(coordinate.lat)>::value, "coordinate types incompatible");
         static_assert(std::is_same<decltype(lon), decltype(coordinate.lon)>::value, "coordinate types incompatible");

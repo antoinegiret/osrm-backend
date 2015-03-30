@@ -42,8 +42,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vector>
 
 ExtractorCallbacks::ExtractorCallbacks(ExtractionContainers &extraction_containers,
-                                       std::unordered_map<std::string, NodeID> &string_map)
-    : string_map(string_map), external_memory(extraction_containers)
+                                       std::unordered_map<std::string, NodeID> &string_map,
+                                       std::unordered_map<NodeID, FixedPointCoordinate> &coordinates_map)
+    : string_map(string_map), coordinates_map(coordinates_map), external_memory(extraction_containers)
 {
 }
 
@@ -51,9 +52,16 @@ ExtractorCallbacks::ExtractorCallbacks(ExtractionContainers &extraction_containe
 void ExtractorCallbacks::ProcessNode(const osmium::Node &input_node,
                                      const ExtractionNode &result_node)
 {
+	const int lat = static_cast<int>(input_node.location().lat() * COORDINATE_PRECISION);
+	const int lon = static_cast<int>(input_node.location().lon() * COORDINATE_PRECISION);
+	const int ele = static_cast<int>(atof(input_node.tags().get_value_by_key("height")) * COORDINATE_PRECISION);
+	const FixedPointCoordinate coordinates(lat, lon, ele);
+	coordinates_map.insert(std::make_pair(static_cast<NodeID>(input_node.id()), coordinates));
+	
     external_memory.all_nodes_list.push_back({
-        static_cast<int>(input_node.location().lat() * COORDINATE_PRECISION),
-        static_cast<int>(input_node.location().lon() * COORDINATE_PRECISION),
+        lat,
+        lon,
+        ele,
         static_cast<NodeID>(input_node.id()),
         result_node.barrier,
         result_node.traffic_lights
@@ -125,23 +133,23 @@ void ExtractorCallbacks::ProcessWay(const osmium::Way &input_way, const Extracti
     const bool split_edge = (parsed_way.forward_speed > 0) &&
                             (TRAVEL_MODE_INACCESSIBLE != parsed_way.forward_travel_mode) &&
                             (parsed_way.backward_speed > 0) &&
-                            (TRAVEL_MODE_INACCESSIBLE != parsed_way.backward_travel_mode) &&
+                            (TRAVEL_MODE_INACCESSIBLE != parsed_way.backward_travel_mode)/* &&
                             ((parsed_way.forward_speed != parsed_way.backward_speed) ||
                              (parsed_way.forward_travel_mode != parsed_way.backward_travel_mode) ||
-                             (parsed_way.forward_facility != parsed_way.backward_facility));
+                             (parsed_way.forward_facility != parsed_way.backward_facility))*/;
 
     auto pair_wise_segment_split = [&](const osmium::NodeRef &first_node,
                                        const osmium::NodeRef &last_node)
     {
-        // SimpleLogger().Write() << "adding edge (" << first_node.ref() << "," <<
-        // last_node.ref() << "), fwd speed: " << parsed_way.forward_speed;
+		const double slope_ratio = GetSlopeRatio(first_node, last_node);
+		
         external_memory.all_edges_list.push_back(InternalExtractorEdge(
             first_node.ref(),
             last_node.ref(),
             ((split_edge || TRAVEL_MODE_INACCESSIBLE == parsed_way.backward_travel_mode)
                  ? ExtractionWay::oneway
                  : ExtractionWay::bidirectional),
-            parsed_way.forward_speed,
+            parsed_way.forward_speed * slope_ratio,
             name_id,
             parsed_way.roundabout,
             parsed_way.ignore_in_grid,
@@ -158,6 +166,13 @@ void ExtractorCallbacks::ProcessWay(const osmium::Way &input_way, const Extracti
     {
         const_cast<ExtractionWay&>(parsed_way).forward_travel_mode = parsed_way.backward_travel_mode;
         const_cast<ExtractionWay&>(parsed_way).backward_travel_mode = TRAVEL_MODE_INACCESSIBLE;
+        
+        const_cast<ExtractionWay&>(parsed_way).forward_speed = parsed_way.backward_speed;
+        const_cast<ExtractionWay&>(parsed_way).backward_speed = 0.0;
+        
+        const_cast<ExtractionWay&>(parsed_way).forward_facility = parsed_way.backward_facility;
+        const_cast<ExtractionWay&>(parsed_way).backward_facility = FACILITY_FORBIDDEN;
+        
         osrm::for_each_pair(
             input_way.nodes().crbegin(), input_way.nodes().crend(), pair_wise_segment_split);
         external_memory.used_node_id_list.push_back(input_way.nodes().front().ref());
@@ -183,13 +198,13 @@ void ExtractorCallbacks::ProcessWay(const osmium::Way &input_way, const Extracti
         auto pair_wise_segment_split_2 = [&](const osmium::NodeRef &first_node,
                                              const osmium::NodeRef &last_node)
         {
-            // SimpleLogger().Write() << "adding edge (" << last_node.ref() << "," <<
-            // first_node.ref() << "), bwd speed: " << parsed_way.backward_speed;
+            const double slope_ratio = GetSlopeRatio(last_node, first_node);
+            
             external_memory.all_edges_list.push_back(
                 InternalExtractorEdge(last_node.ref(),
                                       first_node.ref(),
                                       ExtractionWay::oneway,
-                                      parsed_way.backward_speed,
+                                      parsed_way.backward_speed * slope_ratio,
                                       name_id,
                                       parsed_way.roundabout,
                                       parsed_way.ignore_in_grid,
@@ -202,7 +217,6 @@ void ExtractorCallbacks::ProcessWay(const osmium::Way &input_way, const Extracti
 
         if (is_opposite_way)
         {
-            // SimpleLogger().Write() << "opposite2";
             osrm::for_each_pair(input_way.nodes().crbegin(),
                           input_way.nodes().crend(),
                           pair_wise_segment_split_2);
@@ -223,4 +237,26 @@ void ExtractorCallbacks::ProcessWay(const osmium::Way &input_way, const Extracti
              (NodeID)input_way.nodes().back().ref(),
              (NodeID)input_way.nodes()[input_way.nodes().size() - 2].ref()});
     }
+}
+
+double ExtractorCallbacks::GetSlopeRatio(const osmium::NodeRef &first_node, const osmium::NodeRef &last_node) {
+	const auto &first_node_coordinates_map_iterator = coordinates_map.find(first_node.ref());
+	const auto &last_node_coordinates_map_iterator = coordinates_map.find(last_node.ref());
+	if (coordinates_map.end() != first_node_coordinates_map_iterator && coordinates_map.end() != last_node_coordinates_map_iterator) {
+		const FixedPointCoordinate first_node_coordinates = first_node_coordinates_map_iterator->second;
+		const FixedPointCoordinate last_node_coordinates = last_node_coordinates_map_iterator->second;
+		
+		const double distance = FixedPointCoordinate::ApproximateEuclideanDistance(first_node_coordinates, last_node_coordinates);
+		const double diff_ele = (last_node_coordinates.ele - first_node_coordinates.ele) / COORDINATE_PRECISION;
+		const double slope_percentage = diff_ele / distance;
+		
+		if(slope_percentage > 0.08) {
+			return 0.75;
+		}
+		else if(slope_percentage > 0.04) {
+			return 0.5;
+		}
+	}
+	
+	return 1.0;
 }

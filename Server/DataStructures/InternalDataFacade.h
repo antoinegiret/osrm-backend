@@ -135,7 +135,7 @@ template <class EdgeDataT> class InternalDataFacade : public BaseDataFacade<Edge
         for (unsigned i = 0; i < number_of_coordinates; ++i)
         {
             nodes_input_stream.read((char *)&current_node, sizeof(QueryNode));
-            m_coordinate_list->at(i) = FixedPointCoordinate(current_node.lat, current_node.lon);
+            m_coordinate_list->at(i) = FixedPointCoordinate(current_node.lat, current_node.lon, current_node.ele);
             BOOST_ASSERT((std::abs(m_coordinate_list->at(i).lat) >> 30) == 0);
             BOOST_ASSERT((std::abs(m_coordinate_list->at(i).lon) >> 30) == 0);
         }

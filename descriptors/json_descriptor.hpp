@@ -142,6 +142,13 @@ template <class DataFacadeT> class JSONDescriptor final : public BaseDescriptor<
                 description_factory.AppendGeometryString(config.encode_geometry);
             json_result.values["route_geometry"] = route_geometry;
         }
+        
+        JSON::Array json_route_elevations;
+        BuildElevationArray(description_factory,
+                            json_route_elevations,
+                            raw_route.segment_end_coordinates.back().target_phantom.location.ele / COORDINATE_PRECISION);
+        json_result.values["route_elevations"] = json_route_elevations;
+        
         if (config.instructions)
         {
             JSON::Array json_route_instructions;
@@ -156,6 +163,7 @@ template <class DataFacadeT> class JSONDescriptor final : public BaseDescriptor<
         JSON::Object json_route_summary;
         json_route_summary.values["total_distance"] = description_factory.summary.distance;
         json_route_summary.values["total_time"] = description_factory.summary.duration;
+        json_route_summary.values["vertical_gain"] = 0.0;
         json_route_summary.values["start_point"] =
             facade->GetEscapedNameForNameID(description_factory.summary.source_name_id);
         json_route_summary.values["end_point"] =
@@ -172,6 +180,9 @@ template <class DataFacadeT> class JSONDescriptor final : public BaseDescriptor<
         json_first_coordinate.values.push_back(
             raw_route.segment_end_coordinates.front().source_phantom.location.lon /
             COORDINATE_PRECISION);
+        json_first_coordinate.values.push_back(
+            raw_route.segment_end_coordinates.front().source_phantom.location.ele /
+            COORDINATE_PRECISION);
         json_via_points_array.values.push_back(json_first_coordinate);
         for (const PhantomNodes &nodes : raw_route.segment_end_coordinates)
         {
@@ -180,6 +191,8 @@ template <class DataFacadeT> class JSONDescriptor final : public BaseDescriptor<
             json_coordinate.values.push_back(nodes.target_phantom.location.lat /
                                              COORDINATE_PRECISION);
             json_coordinate.values.push_back(nodes.target_phantom.location.lon /
+                                             COORDINATE_PRECISION);
+			json_coordinate.values.push_back(nodes.target_phantom.location.ele /
                                              COORDINATE_PRECISION);
             json_via_points_array.values.push_back(json_coordinate);
         }
@@ -220,6 +233,13 @@ template <class DataFacadeT> class JSONDescriptor final : public BaseDescriptor<
                 json_alternate_geometries_array.values.push_back(alternate_geometry_string);
                 json_result.values["alternative_geometries"] = json_alternate_geometries_array;
             }
+            
+            JSON::Array json_alt_elevations;
+			BuildElevationArray(alternate_description_factory,
+								json_alt_elevations,
+								raw_route.segment_end_coordinates.back().target_phantom.location.ele / COORDINATE_PRECISION);
+			json_result.values["alternative_elevations"] = json_alt_elevations;
+            
             // Generate instructions for each alternative (simulated here)
             JSON::Array json_alt_instructions;
             JSON::Array json_current_alt_instructions;
@@ -232,6 +252,7 @@ template <class DataFacadeT> class JSONDescriptor final : public BaseDescriptor<
                 json_alt_instructions.values.push_back(json_current_alt_instructions);
                 json_result.values["alternative_instructions"] = json_alt_instructions;
             }
+            
             alternate_description_factory.BuildRouteSummary(
                 alternate_description_factory.get_entire_length(), raw_route.alternative_path_length);
 
@@ -241,6 +262,7 @@ template <class DataFacadeT> class JSONDescriptor final : public BaseDescriptor<
                 alternate_description_factory.summary.distance;
             json_alternate_route_summary.values["total_time"] =
                 alternate_description_factory.summary.duration;
+			json_alternate_route_summary.values["vertical_gain"] = 0.0;
             json_alternate_route_summary.values["start_point"] = facade->GetEscapedNameForNameID(
                 alternate_description_factory.summary.source_name_id);
             json_alternate_route_summary.values["end_point"] = facade->GetEscapedNameForNameID(
@@ -389,6 +411,43 @@ template <class DataFacadeT> class JSONDescriptor final : public BaseDescriptor<
         json_last_instruction_row.values.push_back(0.);
         json_instruction_array.values.push_back(json_last_instruction_row);
     }
+    
+    inline void BuildElevationArray(DescriptionFactory &description_factory,
+                                    JSON::Array &json_route_elevations,
+                                    const double target_ele) {
+		
+		unsigned necessary_segments_running_index = 0;
+		double temp_dist = 0.0;
+		
+		for (const SegmentInformation &segment : description_factory.path_description)
+        {
+			JSON::Array json_elevation_row;
+			
+			TurnInstruction current_instruction = segment.turn_instruction;
+            if (TurnInstructionsClass::TurnIsNecessary(current_instruction))
+            {
+				json_elevation_row.values.push_back(temp_dist);
+				json_elevation_row.values.push_back(segment.location.ele / COORDINATE_PRECISION);
+				json_elevation_row.values.push_back(true);
+				json_elevation_row.values.push_back(necessary_segments_running_index);
+				
+				json_route_elevations.values.push_back(json_elevation_row);
+				temp_dist += round(segment.length);
+			}
+			
+			if (segment.necessary)
+            {
+                ++necessary_segments_running_index;
+            }
+		}
+		
+		JSON::Array json_last_elevation_row;
+		json_last_elevation_row.values.push_back(round(description_factory.get_entire_length()));
+		json_last_elevation_row.values.push_back(target_ele);
+		json_last_elevation_row.values.push_back(true);
+		json_last_elevation_row.values.push_back(necessary_segments_running_index - 1);
+		json_route_elevations.values.push_back(json_last_elevation_row);
+	}
 };
 
 #endif /* JSON_DESCRIPTOR_HPP */
