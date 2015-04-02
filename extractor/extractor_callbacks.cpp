@@ -251,7 +251,7 @@ double ExtractorCallbacks::GetSlopeRatio(const osmium::NodeRef &first_node, cons
 		const double slope_percentage = diff_ele / distance;
 		
 		if(slope_percentage > 0.08) {
-			return 0.75;
+			return 0.25;
 		}
 		else if(slope_percentage > 0.04) {
 			return 0.5;
