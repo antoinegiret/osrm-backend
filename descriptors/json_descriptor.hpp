@@ -440,7 +440,6 @@ template <class DataFacadeT> class JSONDescriptor final : public BaseDescriptor<
             {
 				json_elevation_row.values.push_back(temp_dist);
 				json_elevation_row.values.push_back(segment.location.ele / COORDINATE_PRECISION);
-				json_elevation_row.values.push_back(true);
 				json_elevation_row.values.push_back(necessary_segments_running_index);
 				
 				json_route_elevations.values.push_back(json_elevation_row);
@@ -456,7 +455,6 @@ template <class DataFacadeT> class JSONDescriptor final : public BaseDescriptor<
 		JSON::Array json_last_elevation_row;
 		json_last_elevation_row.values.push_back(round(description_factory.get_entire_length()));
 		json_last_elevation_row.values.push_back(target_ele);
-		json_last_elevation_row.values.push_back(true);
 		json_last_elevation_row.values.push_back(necessary_segments_running_index - 1);
 		json_route_elevations.values.push_back(json_last_elevation_row);
 	}
