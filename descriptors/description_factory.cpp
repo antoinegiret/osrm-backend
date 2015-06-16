@@ -88,6 +88,7 @@ void DescriptionFactory::AppendSegment(const FixedPointCoordinate &coordinate,
         {
             path_description.front().name_id = path_point.name_id;
             path_description.front().travel_mode = path_point.travel_mode;
+            path_description.front().facility = path_point.facility;
         }
         return;
     }
@@ -95,12 +96,9 @@ void DescriptionFactory::AppendSegment(const FixedPointCoordinate &coordinate,
     // make sure mode and facility changes are announced, even when there otherwise is no turn
     const TurnInstruction turn = [&]() -> TurnInstruction
     {
-        if ((TurnInstruction::NoTurn == path_point.turn_instruction &&
-            path_description.front().travel_mode != path_point.travel_mode &&
-            path_point.segment_duration > 0) ||
-            (TurnInstruction::NoTurn == path_point.turn_instruction &&
-            path_description.front().facility != path_point.facility &&
-            path_point.segment_duration > 0))
+        if (TurnInstruction::NoTurn == path_point.turn_instruction &&
+            (path_description.front().travel_mode != path_point.travel_mode || path_description[path_description.size() - 2].facility != path_point.facility) &&
+            path_point.segment_duration > 0)
         {
             return TurnInstruction::GoStraight;
         }
