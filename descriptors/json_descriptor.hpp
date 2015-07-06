@@ -426,7 +426,7 @@ template <class DataFacadeT> class JSONDescriptor final : public BaseDescriptor<
         json_last_instruction_row.values.push_back(0.);
         json_last_instruction_row.values.push_back(1);
         json_last_instruction_row.values.push_back(1);
-        json_last_instruction_row.values.push_back('');
+        json_last_instruction_row.values.push_back("");
         json_instruction_array.values.push_back(json_last_instruction_row);
     }
     
