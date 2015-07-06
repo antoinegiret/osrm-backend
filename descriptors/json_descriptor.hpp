@@ -395,14 +395,7 @@ template <class DataFacadeT> class JSONDescriptor final : public BaseDescriptor<
                     json_instruction_row.values.push_back(segment.facility);
                     
                     std::string towns = current_name.substr(current_name.find_last_of(',') + 2);
-                    if(towns.compare("none") != 0)
-                    {
-						json_instruction_row.values.push_back(towns);
-					}
-					else
-					{
-						json_instruction_row.values.push_back(NULL);
-					}
+                    json_instruction_row.values.push_back(towns);
 
                     route_segments_list.emplace_back(
                         segment.name_id,
@@ -433,7 +426,7 @@ template <class DataFacadeT> class JSONDescriptor final : public BaseDescriptor<
         json_last_instruction_row.values.push_back(0.);
         json_last_instruction_row.values.push_back(1);
         json_last_instruction_row.values.push_back(1);
-        json_last_instruction_row.values.push_back(NULL);
+        json_last_instruction_row.values.push_back('');
         json_instruction_array.values.push_back(json_last_instruction_row);
     }
     
