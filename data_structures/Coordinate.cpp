@@ -41,11 +41,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <limits>
 
 FixedPointCoordinate::FixedPointCoordinate()
-    : lat(std::numeric_limits<int>::min()), lon(std::numeric_limits<int>::min()), ele(std::numeric_limits<int>::min())
+    : lat(std::numeric_limits<int>::min()), lon(std::numeric_limits<int>::min()), ele(std::numeric_limits<double>::min())
 {
 }
 
-FixedPointCoordinate::FixedPointCoordinate(int lat, int lon) : lat(lat), lon(lon), ele(0)
+FixedPointCoordinate::FixedPointCoordinate(int lat, int lon) : lat(lat), lon(lon), ele(0.0)
 {
 #ifndef NDEBUG
     if (0 != (std::abs(lat) >> 30))
@@ -63,7 +63,7 @@ FixedPointCoordinate::FixedPointCoordinate(int lat, int lon) : lat(lat), lon(lon
 #endif
 }
 
-FixedPointCoordinate::FixedPointCoordinate(int lat, int lon, int ele) : lat(lat), lon(lon), ele(ele)
+FixedPointCoordinate::FixedPointCoordinate(int lat, int lon, double ele) : lat(lat), lon(lon), ele(ele)
 {
 #ifndef NDEBUG
     if (0 != (std::abs(lat) >> 30))
@@ -85,7 +85,7 @@ void FixedPointCoordinate::Reset()
 {
     lat = std::numeric_limits<int>::min();
     lon = std::numeric_limits<int>::min();
-    ele = std::numeric_limits<int>::min();
+    ele = std::numeric_limits<double>::min();
 }
 bool FixedPointCoordinate::isSet() const
 {
@@ -263,7 +263,7 @@ FixedPointCoordinate::ComputePerpendicularDistance(const FixedPointCoordinate &s
     { // point lies in between
         nearest_location.lat = static_cast<int>(y2lat(p) * COORDINATE_PRECISION);
         nearest_location.lon = static_cast<int>(q * COORDINATE_PRECISION);
-        nearest_location.ele = static_cast<int>(source_coordinate.ele + ratio * (target_coordinate.ele - source_coordinate.ele));
+        nearest_location.ele = source_coordinate.ele + ratio * (target_coordinate.ele - source_coordinate.ele);
     }
 
     BOOST_ASSERT(nearest_location.is_valid());
@@ -338,7 +338,7 @@ float FixedPointCoordinate::ComputePerpendicularDistance(const FixedPointCoordin
         // point lies in between
         nearest_location.lat = static_cast<int>(y2lat(p) * COORDINATE_PRECISION);
         nearest_location.lon = static_cast<int>(q * COORDINATE_PRECISION);
-        nearest_location.ele = static_cast<int>(segment_source.ele + ratio * (segment_target.ele - segment_source.ele));
+        nearest_location.ele = segment_source.ele + ratio * (segment_target.ele - segment_source.ele);
     }
     BOOST_ASSERT(nearest_location.is_valid());
 
@@ -382,7 +382,7 @@ FixedPointCoordinate::convertInternalReversedCoordinateToString(const FixedPoint
 
 void FixedPointCoordinate::Output(std::ostream &out) const
 {
-    out << "(" << lat / COORDINATE_PRECISION << "," << lon / COORDINATE_PRECISION << "," << ele / COORDINATE_PRECISION << ")";
+    out << "(" << lat / COORDINATE_PRECISION << "," << lon / COORDINATE_PRECISION << "," << ele << ")";
 }
 
 float FixedPointCoordinate::GetBearing(const FixedPointCoordinate &first_coordinate,

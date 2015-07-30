@@ -54,7 +54,7 @@ void ExtractorCallbacks::ProcessNode(const osmium::Node &input_node,
 {
 	const int lat = static_cast<int>(input_node.location().lat() * COORDINATE_PRECISION);
 	const int lon = static_cast<int>(input_node.location().lon() * COORDINATE_PRECISION);
-	const int ele = static_cast<int>(atof(input_node.tags().get_value_by_key("height")) * COORDINATE_PRECISION);
+	const double ele = atof(input_node.tags().get_value_by_key("height"));
 	const FixedPointCoordinate coordinates(lat, lon, ele);
 	coordinates_map.insert(std::make_pair(static_cast<NodeID>(input_node.id()), coordinates));
 	
@@ -247,7 +247,7 @@ double ExtractorCallbacks::GetSlopeRatio(const osmium::NodeRef &first_node, cons
 		const FixedPointCoordinate last_node_coordinates = last_node_coordinates_map_iterator->second;
 		
 		const double distance = FixedPointCoordinate::ApproximateEuclideanDistance(first_node_coordinates, last_node_coordinates);
-		const double diff_ele = (last_node_coordinates.ele - first_node_coordinates.ele) / COORDINATE_PRECISION;
+		const double diff_ele = last_node_coordinates.ele - first_node_coordinates.ele;
 		const double slope_percentage = diff_ele / distance;
 		
 		if(slope_percentage > 0.08) {

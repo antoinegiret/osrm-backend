@@ -40,11 +40,11 @@ struct FixedPointCoordinate
 {
     int lat;
     int lon;
-    int ele;
+    double ele;
 
     FixedPointCoordinate();
     FixedPointCoordinate(int lat, int lon);
-    FixedPointCoordinate(int lat, int lon, int ele);
+    FixedPointCoordinate(int lat, int lon, double ele);
 
     template<class T>
     FixedPointCoordinate(const T &coordinate) : lat(coordinate.lat), lon(coordinate.lon), ele(coordinate.ele)

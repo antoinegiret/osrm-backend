@@ -41,16 +41,16 @@ struct QueryNode
     using key_type = NodeID; // type of NodeID
     using value_type = int; // type of lat,lons
 
-    explicit QueryNode(int lat, int lon, int ele, NodeID node_id) : lat(lat), lon(lon), ele(ele), node_id(node_id) {}
+    explicit QueryNode(int lat, int lon, double ele, NodeID node_id) : lat(lat), lon(lon), ele(ele), node_id(node_id) {}
     QueryNode()
-        : lat(std::numeric_limits<int>::max()), lon(std::numeric_limits<int>::max()), ele(std::numeric_limits<int>::max()),
+        : lat(std::numeric_limits<int>::max()), lon(std::numeric_limits<int>::max()), ele(std::numeric_limits<double>::max()),
           node_id(std::numeric_limits<unsigned>::max())
     {
     }
 
     int lat;
     int lon;
-    int ele;
+    double ele;
     NodeID node_id;
 
     static QueryNode min_value()
@@ -65,7 +65,7 @@ struct QueryNode
     {
         return QueryNode(static_cast<int>(90 * COORDINATE_PRECISION),
                          static_cast<int>(180 * COORDINATE_PRECISION),
-                         std::numeric_limits<int>::max(),
+                         std::numeric_limits<double>::max(),
                          std::numeric_limits<NodeID>::max());
     }
 

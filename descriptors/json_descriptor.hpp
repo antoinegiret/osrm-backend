@@ -146,7 +146,7 @@ template <class DataFacadeT> class JSONDescriptor final : public BaseDescriptor<
         JSON::Array json_route_elevations;
         BuildElevationArray(description_factory,
                             json_route_elevations,
-                            raw_route.segment_end_coordinates.back().target_phantom.location.ele / COORDINATE_PRECISION);
+                            raw_route.segment_end_coordinates.back().target_phantom.location.ele);
         json_result.values["route_elevations"] = json_route_elevations;
         
         if (config.instructions)
@@ -167,7 +167,7 @@ template <class DataFacadeT> class JSONDescriptor final : public BaseDescriptor<
         double vertical_gain = 0.0;
 		BuildVerticalGain(description_factory,
 						  vertical_gain,
-						  raw_route.segment_end_coordinates.back().target_phantom.location.ele / COORDINATE_PRECISION);
+						  raw_route.segment_end_coordinates.back().target_phantom.location.ele);
 		json_route_summary.values["vertical_gain"] = vertical_gain;
         
         std::string start_point = facade->GetEscapedNameForNameID(description_factory.summary.source_name_id);
@@ -188,9 +188,7 @@ template <class DataFacadeT> class JSONDescriptor final : public BaseDescriptor<
         json_first_coordinate.values.push_back(
             raw_route.segment_end_coordinates.front().source_phantom.location.lon /
             COORDINATE_PRECISION);
-        json_first_coordinate.values.push_back(
-            raw_route.segment_end_coordinates.front().source_phantom.location.ele /
-            COORDINATE_PRECISION);
+        json_first_coordinate.values.push_back(raw_route.segment_end_coordinates.front().source_phantom.location.ele);
         json_via_points_array.values.push_back(json_first_coordinate);
         for (const PhantomNodes &nodes : raw_route.segment_end_coordinates)
         {
@@ -200,8 +198,7 @@ template <class DataFacadeT> class JSONDescriptor final : public BaseDescriptor<
                                              COORDINATE_PRECISION);
             json_coordinate.values.push_back(nodes.target_phantom.location.lon /
                                              COORDINATE_PRECISION);
-			json_coordinate.values.push_back(nodes.target_phantom.location.ele /
-                                             COORDINATE_PRECISION);
+			json_coordinate.values.push_back(nodes.target_phantom.location.ele);
             json_via_points_array.values.push_back(json_coordinate);
         }
         json_result.values["via_points"] = json_via_points_array;
@@ -245,7 +242,7 @@ template <class DataFacadeT> class JSONDescriptor final : public BaseDescriptor<
             JSON::Array json_alt_elevations;
 			BuildElevationArray(alternate_description_factory,
 								json_alt_elevations,
-								raw_route.segment_end_coordinates.back().target_phantom.location.ele / COORDINATE_PRECISION);
+								raw_route.segment_end_coordinates.back().target_phantom.location.ele);
 			json_result.values["alternative_elevations"] = json_alt_elevations;
             
             // Generate instructions for each alternative (simulated here)
@@ -274,7 +271,7 @@ template <class DataFacadeT> class JSONDescriptor final : public BaseDescriptor<
 			double alternate_vertical_gain = 0.0;
 			BuildVerticalGain(alternate_description_factory,
                               alternate_vertical_gain,
-                              raw_route.segment_end_coordinates.back().target_phantom.location.ele / COORDINATE_PRECISION);
+                              raw_route.segment_end_coordinates.back().target_phantom.location.ele);
 			json_alternate_route_summary.values["vertical_gain"] = alternate_vertical_gain;
             
             json_alternate_route_summary.values["start_point"] = start_point;
@@ -445,7 +442,7 @@ template <class DataFacadeT> class JSONDescriptor final : public BaseDescriptor<
             if (TurnInstructionsClass::TurnIsNecessary(current_instruction))
             {
 				json_elevation_row.values.push_back(temp_dist);
-				json_elevation_row.values.push_back(segment.location.ele / COORDINATE_PRECISION);
+				json_elevation_row.values.push_back(segment.location.ele);
 				json_elevation_row.values.push_back(necessary_segments_running_index);
 				
 				json_route_elevations.values.push_back(json_elevation_row);
@@ -469,11 +466,11 @@ template <class DataFacadeT> class JSONDescriptor final : public BaseDescriptor<
                                   double &vertical_gain,
                                   const double target_ele) {
 	
-		double previous_ele = description_factory.path_description.front().location.ele / COORDINATE_PRECISION;
+		double previous_ele = description_factory.path_description.front().location.ele;
 		
 		for (const SegmentInformation &segment : description_factory.path_description)
 		{
-			const double current_ele = segment.location.ele / COORDINATE_PRECISION;
+			const double current_ele = segment.location.ele;
 			const double diff_ele = current_ele - previous_ele;
 			if(diff_ele > 0.0)
 			{
