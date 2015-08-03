@@ -130,6 +130,19 @@ void ExtractorCallbacks::ProcessWay(const osmium::Way &input_way, const Extracti
         name_id = string_map_iterator->second;
     }
 
+    // Get the unique identifier for the street towns
+    const auto &string_map_iterator_2 = string_map.find(parsed_way.towns);
+    unsigned towns_id = external_memory.towns_list.size();
+    if (string_map.end() == string_map_iterator_2)
+    {
+        external_memory.towns_list.push_back(parsed_way.towns);
+        string_map.insert(std::make_pair(parsed_way.towns, towns_id));
+    }
+    else
+    {
+        towns_id = string_map_iterator_2->second;
+    }
+
     const bool split_edge = (parsed_way.forward_speed > 0) &&
                             (TRAVEL_MODE_INACCESSIBLE != parsed_way.forward_travel_mode) &&
                             (parsed_way.backward_speed > 0) &&
@@ -151,6 +164,7 @@ void ExtractorCallbacks::ProcessWay(const osmium::Way &input_way, const Extracti
                  : ExtractionWay::bidirectional),
             parsed_way.forward_speed * slope_ratio,
             name_id,
+            towns_id,
             parsed_way.roundabout,
             parsed_way.ignore_in_grid,
             (0 < parsed_way.duration),
@@ -206,6 +220,7 @@ void ExtractorCallbacks::ProcessWay(const osmium::Way &input_way, const Extracti
                                       ExtractionWay::oneway,
                                       parsed_way.backward_speed * slope_ratio,
                                       name_id,
+                                      towns_id,
                                       parsed_way.roundabout,
                                       parsed_way.ignore_in_grid,
                                       (0 < parsed_way.duration),

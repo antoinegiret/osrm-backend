@@ -27,7 +27,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "phantom_node.hpp"
 
-PhantomNode::PhantomNode(NodeID forward_node_id, NodeID reverse_node_id, unsigned name_id,
+PhantomNode::PhantomNode(NodeID forward_node_id, NodeID reverse_node_id, unsigned name_id, unsigned towns_id,
             int forward_weight, int reverse_weight, int forward_offset, int reverse_offset,
             unsigned packed_geometry_id, unsigned component_id, FixedPointCoordinate &location,
             unsigned short fwd_segment_position,
@@ -36,6 +36,7 @@ PhantomNode::PhantomNode(NodeID forward_node_id, NodeID reverse_node_id, unsigne
     forward_node_id(forward_node_id),
     reverse_node_id(reverse_node_id),
     name_id(name_id),
+    towns_id(towns_id),
     forward_weight(forward_weight),
     reverse_weight(reverse_weight),
     forward_offset(forward_offset),
@@ -54,6 +55,7 @@ PhantomNode::PhantomNode() :
     forward_node_id(SPECIAL_NODEID),
     reverse_node_id(SPECIAL_NODEID),
     name_id(std::numeric_limits<unsigned>::max()),
+    towns_id(std::numeric_limits<unsigned>::max()),
     forward_weight(INVALID_EDGE_WEIGHT),
     reverse_weight(INVALID_EDGE_WEIGHT),
     forward_offset(0),

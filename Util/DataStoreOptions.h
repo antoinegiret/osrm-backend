@@ -75,7 +75,10 @@ bool GenerateDataStoreOptions(const int argc, const char *argv[], ServerPaths &p
         ".fileIndex file")(
         "namesdata",
         boost::program_options::value<boost::filesystem::path>(&paths["namesdata"]),
-        ".names file")("timestamp",
+        ".names file")(
+            "townsdata",
+            boost::program_options::value<boost::filesystem::path>(&paths["townsdata"]),
+            ".towns file")("timestamp",
                        boost::program_options::value<boost::filesystem::path>(&paths["timestamp"]),
                        ".timestamp file");
 
@@ -211,6 +214,12 @@ bool GenerateDataStoreOptions(const int argc, const char *argv[], ServerPaths &p
             path_iterator->second = base_string + ".names";
         }
 
+        path_iterator = paths.find("townsdata");
+        if (path_iterator != paths.end())
+        {
+            path_iterator->second = base_string + ".towns";
+        }
+
         path_iterator = paths.find("timestamp");
         if (path_iterator != paths.end())
         {
@@ -264,6 +273,13 @@ bool GenerateDataStoreOptions(const int argc, const char *argv[], ServerPaths &p
     if (path_iterator == paths.end() || path_iterator->second.string().empty())
     {
         throw osrm::exception(".names file must be specified");
+    }
+    AssertPathExists(path_iterator->second);
+
+    path_iterator = paths.find("townsdata");
+    if (path_iterator == paths.end() || path_iterator->second.string().empty())
+    {
+        throw osrm::exception(".towns file must be specified");
     }
     AssertPathExists(path_iterator->second);
 

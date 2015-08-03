@@ -115,10 +115,21 @@ template <class EdgeDataT> class BaseDataFacade
 
     virtual void GetName(const unsigned name_id, std::string &result) const = 0;
 
+    virtual unsigned GetTownsIndexFromEdgeID(const unsigned id) const = 0;
+
+    virtual void GetTowns(const unsigned towns_id, std::string &result) const = 0;
+
     std::string GetEscapedNameForNameID(const unsigned name_id) const
     {
         std::string temporary_string;
         GetName(name_id, temporary_string);
+        return EscapeJSONString(temporary_string);
+    }
+
+    std::string GetEscapedTownsForTownsID(const unsigned towns_id) const
+    {
+        std::string temporary_string;
+        GetTowns(towns_id, temporary_string);
         return EscapeJSONString(temporary_string);
     }
 

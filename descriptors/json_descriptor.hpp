@@ -172,10 +172,8 @@ template <class DataFacadeT> class JSONDescriptor final : public BaseDescriptor<
         
         std::string start_point = facade->GetEscapedNameForNameID(description_factory.summary.source_name_id);
         std::string end_point = facade->GetEscapedNameForNameID(description_factory.summary.target_name_id);
-        json_route_summary.values["start_point"] =
-            start_point.substr(0, start_point.find_last_of(','));
-        json_route_summary.values["end_point"] =
-            end_point.substr(0, end_point.find_last_of(','));
+        json_route_summary.values["start_point"] = start_point;
+        json_route_summary.values["end_point"] = end_point;
         json_result.values["route_summary"] = json_route_summary;
 
         BOOST_ASSERT(!raw_route.segment_end_coordinates.empty());
@@ -296,16 +294,16 @@ template <class DataFacadeT> class JSONDescriptor final : public BaseDescriptor<
         RouteNames route_names =
             GenerateRouteNames(shortest_path_segments, alternative_path_segments, facade);
         JSON::Array json_route_names;
-        json_route_names.values.push_back(route_names.shortest_path_name_1.substr(0, route_names.shortest_path_name_1.find_last_of(',')));
-        json_route_names.values.push_back(route_names.shortest_path_name_2.substr(0, route_names.shortest_path_name_2.find_last_of(',')));
+        json_route_names.values.push_back(route_names.shortest_path_name_1);
+        json_route_names.values.push_back(route_names.shortest_path_name_2);
         json_result.values["route_name"] = json_route_names;
 
         if (INVALID_EDGE_WEIGHT != raw_route.alternative_path_length)
         {
             JSON::Array json_alternate_names_array;
             JSON::Array json_alternate_names;
-            json_alternate_names.values.push_back(route_names.alternative_path_name_1.substr(0, route_names.alternative_path_name_1.find_last_of(',')));
-            json_alternate_names.values.push_back(route_names.alternative_path_name_2.substr(0, route_names.alternative_path_name_2.find_last_of(',')));
+            json_alternate_names.values.push_back(route_names.alternative_path_name_1);
+            json_alternate_names.values.push_back(route_names.alternative_path_name_2);
             json_alternate_names_array.values.push_back(json_alternate_names);
             json_result.values["alternative_names"] = json_alternate_names_array;
         }
@@ -360,6 +358,7 @@ template <class DataFacadeT> class JSONDescriptor final : public BaseDescriptor<
                 else
                 {
 					std::string current_name = facade->GetEscapedNameForNameID(segment.name_id);
+                    std::string current_towns = facade->GetEscapedTownsForTownsID(segment.towns_id);
                     std::string current_turn_instruction;
                     if (TurnInstruction::LeaveRoundAbout == current_instruction)
                     {
@@ -378,7 +377,7 @@ template <class DataFacadeT> class JSONDescriptor final : public BaseDescriptor<
                     }
                     json_instruction_row.values.push_back(current_turn_instruction);
 
-                    json_instruction_row.values.push_back(current_name.substr(0, current_name.find_last_of(',')));
+                    json_instruction_row.values.push_back(current_name);
                     json_instruction_row.values.push_back(std::round(segment.length));
                     json_instruction_row.values.push_back(necessary_segments_running_index);
                     json_instruction_row.values.push_back(round(segment.duration / 10));
@@ -390,9 +389,8 @@ template <class DataFacadeT> class JSONDescriptor final : public BaseDescriptor<
                         static_cast<unsigned>(round(bearing_value)));
                     json_instruction_row.values.push_back(segment.travel_mode);
                     json_instruction_row.values.push_back(segment.facility);
-                    
-                    std::string towns = current_name.substr(current_name.find_last_of(',') + 2);
-                    json_instruction_row.values.push_back(towns);
+
+                    json_instruction_row.values.push_back(current_towns);
 
                     route_segments_list.emplace_back(
                         segment.name_id,
@@ -465,25 +463,19 @@ template <class DataFacadeT> class JSONDescriptor final : public BaseDescriptor<
 	inline void BuildVerticalGain(DescriptionFactory &description_factory,
                                   double &vertical_gain,
                                   const double target_ele) {
-	
-		double previous_ele = description_factory.path_description.front().location.ele;
-		
-		for (const SegmentInformation &segment : description_factory.path_description)
-		{
-			const double current_ele = segment.location.ele;
-			const double diff_ele = current_ele - previous_ele;
-			if(diff_ele > 0.0)
-			{
-				vertical_gain += diff_ele;
-			}
-			previous_ele = current_ele;
-		}
-		
-		const double last_diff_ele = target_ele - previous_ele;
-		if(last_diff_ele > 0.0)
-		{
-			vertical_gain += last_diff_ele;
-		}
+
+        double current_ele, next_ele, diff_ele, alpha;
+
+        for (unsigned i = 0; i < description_factory.path_description.size(); ++i) {
+            current_ele = description_factory.path_description[i].location.ele;
+            next_ele = i != description_factory.path_description.size() - 1 ? description_factory.path_description[i + 1].location.ele : target_ele;
+            diff_ele = next_ele - current_ele;
+            alpha = diff_ele / description_factory.path_description[i].length;
+            if(alpha >= 0.05)
+            {
+                vertical_gain += diff_ele;
+            }
+        }
 	}
 };
 

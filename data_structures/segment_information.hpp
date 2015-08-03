@@ -41,6 +41,7 @@ struct SegmentInformation
 {
     FixedPointCoordinate location;
     NodeID name_id;
+    NodeID towns_id;
     EdgeWeight duration;
     float length;
     short bearing; // more than enough [0..3600] fits into 12 bits
@@ -52,6 +53,7 @@ struct SegmentInformation
 
     explicit SegmentInformation(const FixedPointCoordinate &location,
                                 const NodeID name_id,
+                                const NodeID towns_id,
                                 const EdgeWeight duration,
                                 const float length,
                                 const TurnInstruction turn_instruction,
@@ -59,7 +61,7 @@ struct SegmentInformation
                                 const bool is_via_location,
                                 const TravelMode travel_mode,
                                 const Facility facility)
-        : location(location), name_id(name_id), duration(duration), length(length), bearing(0),
+        : location(location), name_id(name_id), towns_id(towns_id), duration(duration), length(length), bearing(0),
           turn_instruction(turn_instruction), travel_mode(travel_mode), facility(facility),
           necessary(necessary), is_via_location(is_via_location)
     {
@@ -67,12 +69,13 @@ struct SegmentInformation
 
     explicit SegmentInformation(const FixedPointCoordinate &location,
                                 const NodeID name_id,
+                                const NodeID towns_id,
                                 const EdgeWeight duration,
                                 const float length,
                                 const TurnInstruction turn_instruction,
                                 const TravelMode travel_mode,
                                 const Facility facility)
-        : location(location), name_id(name_id), duration(duration), length(length), bearing(0),
+        : location(location), name_id(name_id), towns_id(towns_id), duration(duration), length(length), bearing(0),
           turn_instruction(turn_instruction), travel_mode(travel_mode), facility(facility),
           necessary(turn_instruction != TurnInstruction::NoTurn), is_via_location(false)
     {

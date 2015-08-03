@@ -53,6 +53,7 @@ template <class EdgeDataT> class SharedDataFacade : public BaseDataFacade<EdgeDa
     typedef typename StaticGraph<EdgeData, true>::NodeArrayEntry GraphNode;
     typedef typename StaticGraph<EdgeData, true>::EdgeArrayEntry GraphEdge;
     typedef typename RangeTable<16, true>::BlockT NameIndexBlock;
+    typedef typename RangeTable<16, true>::BlockT TownsIndexBlock;
     typedef typename QueryGraph::InputEdge InputEdge;
     typedef typename super::RTreeLeaf RTreeLeaf;
     using SharedRTree = StaticRTree<RTreeLeaf, ShM<FixedPointCoordinate, true>::vector, true>;
@@ -76,10 +77,12 @@ template <class EdgeDataT> class SharedDataFacade : public BaseDataFacade<EdgeDa
     std::shared_ptr<ShM<FixedPointCoordinate, true>::vector> m_coordinate_list;
     ShM<NodeID, true>::vector m_via_node_list;
     ShM<unsigned, true>::vector m_name_ID_list;
+    ShM<unsigned, true>::vector m_towns_ID_list;
     ShM<TurnInstruction, true>::vector m_turn_instruction_list;
     ShM<TravelMode, true>::vector m_travel_mode_list;
     ShM<Facility, true>::vector m_facility_list;
     ShM<char, true>::vector m_names_char_list;
+    ShM<char, true>::vector m_towns_char_list;
     ShM<unsigned, true>::vector m_name_begin_indices;
     ShM<bool, true>::vector m_edge_is_compressed;
     ShM<unsigned, true>::vector m_geometry_indices;
@@ -89,6 +92,7 @@ template <class EdgeDataT> class SharedDataFacade : public BaseDataFacade<EdgeDa
     boost::filesystem::path file_index_path;
 
     std::shared_ptr<RangeTable<16, true>> m_name_table;
+    std::shared_ptr<RangeTable<16, true>> m_towns_table;
 
     void LoadChecksum()
     {
@@ -170,6 +174,12 @@ template <class EdgeDataT> class SharedDataFacade : public BaseDataFacade<EdgeDa
         typename ShM<unsigned, true>::vector name_id_list(
             name_id_list_ptr, data_layout->num_entries[SharedDataLayout::NAME_ID_LIST]);
         m_name_ID_list.swap(name_id_list);
+
+        unsigned *towns_id_list_ptr =
+                data_layout->GetBlockPtr<unsigned>(shared_memory, SharedDataLayout::TOWNS_ID_LIST);
+        typename ShM<unsigned, true>::vector towns_id_list(
+                towns_id_list_ptr, data_layout->num_entries[SharedDataLayout::TOWNS_ID_LIST]);
+        m_towns_ID_list.swap(towns_id_list);
     }
 
     void LoadViaNodeList()
@@ -200,6 +210,27 @@ template <class EdgeDataT> class SharedDataFacade : public BaseDataFacade<EdgeDa
             name_offsets, name_blocks, static_cast<unsigned>(names_char_list.size()));
 
         m_names_char_list.swap(names_char_list);
+    }
+
+    void LoadTowns()
+    {
+        unsigned *offsets_ptr =
+                data_layout->GetBlockPtr<unsigned>(shared_memory, SharedDataLayout::TOWNS_OFFSETS);
+        TownsIndexBlock *blocks_ptr =
+                data_layout->GetBlockPtr<TownsIndexBlock>(shared_memory, SharedDataLayout::TOWNS_BLOCKS);
+        typename ShM<unsigned, true>::vector towns_offsets(
+                offsets_ptr, data_layout->num_entries[SharedDataLayout::TOWNS_OFFSETS]);
+        typename ShM<TownsIndexBlock, true>::vector towns_blocks(
+                blocks_ptr, data_layout->num_entries[SharedDataLayout::TOWNS_BLOCKS]);
+
+        char *towns_list_ptr =
+                data_layout->GetBlockPtr<char>(shared_memory, SharedDataLayout::TOWNS_CHAR_LIST);
+        typename ShM<char, true>::vector towns_char_list(
+                towns_list_ptr, data_layout->num_entries[SharedDataLayout::TOWNS_CHAR_LIST]);
+        m_towns_table = osrm::make_unique<RangeTable<16, true>>(
+                towns_offsets, towns_blocks, static_cast<unsigned>(towns_char_list.size()));
+
+        m_towns_char_list.swap(towns_char_list);
     }
 
     void LoadGeometries()
@@ -277,6 +308,7 @@ template <class EdgeDataT> class SharedDataFacade : public BaseDataFacade<EdgeDa
             LoadTimestamp();
             LoadViaNodeList();
             LoadNames();
+            LoadTowns();
 
             data_layout->PrintInformation();
 
@@ -434,6 +466,30 @@ template <class EdgeDataT> class SharedDataFacade : public BaseDataFacade<EdgeDa
             result.resize(range.back() - range.front() + 1);
             std::copy(m_names_char_list.begin() + range.front(),
                       m_names_char_list.begin() + range.back() + 1,
+                      result.begin());
+        }
+    }
+
+    unsigned GetTownsIndexFromEdgeID(const unsigned id) const final
+    {
+        return m_towns_ID_list.at(id);
+    };
+
+    void GetTowns(const unsigned towns_id, std::string &result) const final
+    {
+        if (UINT_MAX == towns_id)
+        {
+            result = "";
+            return;
+        }
+        auto range = m_towns_table->GetRange(towns_id);
+
+        result.clear();
+        if (range.begin() != range.end())
+        {
+            result.resize(range.back() - range.front() + 1);
+            std::copy(m_towns_char_list.begin() + range.front(),
+                      m_towns_char_list.begin() + range.back() + 1,
                       result.begin());
         }
     }

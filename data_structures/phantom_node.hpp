@@ -41,6 +41,7 @@ struct PhantomNode
     PhantomNode(NodeID forward_node_id,
                 NodeID reverse_node_id,
                 unsigned name_id,
+                unsigned towns_id,
                 int forward_weight,
                 int reverse_weight,
                 int forward_offset,
@@ -59,6 +60,7 @@ struct PhantomNode
     NodeID forward_node_id;
     NodeID reverse_node_id;
     unsigned name_id;
+    unsigned towns_id;
     int forward_weight;
     int reverse_weight;
     int forward_offset;
@@ -120,6 +122,7 @@ inline std::ostream& operator<<(std::ostream &out, const PhantomNode & pn)
     out <<  "node1: " << pn.forward_node_id      << ", " <<
             "node2: " << pn.reverse_node_id      << ", " <<
             "name: "  << pn.name_id              << ", " <<
+            "towns: " << pn.towns_id             << ", " <<
             "fwd-w: " << pn.forward_weight       << ", " <<
             "rev-w: " << pn.reverse_weight       << ", " <<
             "fwd-o: " << pn.forward_offset       << ", " <<

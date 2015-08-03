@@ -107,6 +107,7 @@ class DescriptionFactory
         {
             // move down names by one, q&d hack
             path_description[i - 1].name_id = path_description[i].name_id;
+            path_description[i - 1].towns_id = path_description[i].towns_id;
             path_description[i].length = FixedPointCoordinate::ApproximateEuclideanDistance(
                 path_description[i - 1].location, path_description[i].location);
         }
@@ -184,6 +185,7 @@ class DescriptionFactory
                 path_description.back().necessary = true;
                 path_description.back().turn_instruction = TurnInstruction::NoTurn;
                 target_phantom.name_id = (path_description.end() - 2)->name_id;
+                target_phantom.towns_id = (path_description.end() - 2)->towns_id;
             }
         }
         if (std::numeric_limits<double>::epsilon() > path_description.front().length)
@@ -194,6 +196,7 @@ class DescriptionFactory
                 path_description.front().turn_instruction = TurnInstruction::HeadOn;
                 path_description.front().necessary = true;
                 start_phantom.name_id = path_description.front().name_id;
+                start_phantom.towns_id = path_description.front().towns_id;
             }
         }
 

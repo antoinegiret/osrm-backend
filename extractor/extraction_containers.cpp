@@ -49,6 +49,7 @@ ExtractionContainers::ExtractionContainers()
     // Check if stxxl can be instantiated
     stxxl::vector<unsigned> dummy_vector;
     name_list.push_back("");
+    towns_list.push_back("");
 }
 
 ExtractionContainers::~ExtractionContainers()
@@ -57,6 +58,7 @@ ExtractionContainers::~ExtractionContainers()
     all_nodes_list.clear();
     all_edges_list.clear();
     name_list.clear();
+    towns_list.clear();
     restrictions_list.clear();
     way_start_end_id_list.clear();
 }
@@ -379,6 +381,7 @@ void ExtractionContainers::PrepareData(const std::string &output_file_name,
 
                 file_out_stream.write((char *)&integer_weight, sizeof(int));
                 file_out_stream.write((char *)&edge_iterator->name_id, sizeof(unsigned));
+                file_out_stream.write((char *)&edge_iterator->towns_id, sizeof(unsigned));
                 file_out_stream.write((char *)&edge_iterator->is_roundabout, sizeof(bool));
                 file_out_stream.write((char *)&edge_iterator->is_in_tiny_cc, sizeof(bool));
                 file_out_stream.write((char *)&edge_iterator->is_access_restricted, sizeof(bool));
@@ -434,6 +437,35 @@ void ExtractionContainers::PrepareData(const std::string &output_file_name,
         name_file_stream.close();
         TIMER_STOP(write_name_index);
         std::cout << "ok, after " << TIMER_SEC(write_name_index) << "s" << std::endl;
+
+        std::cout << "[extractor] writing street towns index ... " << std::flush;
+        TIMER_START(write_towns_index);
+        std::string towns_file_streamName = (output_file_name + ".towns");
+        boost::filesystem::ofstream towns_file_stream(towns_file_streamName, std::ios::binary);
+
+        total_length = 0;
+        std::vector<unsigned> towns_lengths;
+        for (const std::string &temp_string : towns_list)
+        {
+            const unsigned string_length = std::min(static_cast<unsigned>(temp_string.length()), 255u);
+            towns_lengths.push_back(string_length);
+            total_length += string_length;
+        }
+
+        RangeTable<> towns_table(towns_lengths);
+        towns_file_stream << towns_table;
+
+        towns_file_stream.write((char*) &total_length, sizeof(unsigned));
+        // write all chars consecutively
+        for (const std::string &temp_string : towns_list)
+        {
+            const unsigned string_length = std::min(static_cast<unsigned>(temp_string.length()), 255u);
+            towns_file_stream.write(temp_string.c_str(), string_length);
+        }
+
+        towns_file_stream.close();
+        TIMER_STOP(write_towns_index);
+        std::cout << "ok, after " << TIMER_SEC(write_towns_index) << "s" << std::endl;
 
         SimpleLogger().Write() << "Processed " << number_of_used_nodes << " nodes and "
                                << number_of_used_edges << " edges";

@@ -39,11 +39,12 @@ struct OriginalEdgeData
 {
     explicit OriginalEdgeData(NodeID via_node,
                               unsigned name_id,
+                              unsigned towns_id,
                               TurnInstruction turn_instruction,
                               bool compressed_geometry,
                               TravelMode travel_mode,
                               Facility facility)
-        : via_node(via_node), name_id(name_id), turn_instruction(turn_instruction),
+        : via_node(via_node), name_id(name_id), towns_id(towns_id), turn_instruction(turn_instruction),
           compressed_geometry(compressed_geometry), travel_mode(travel_mode), facility(facility)
     {
     }
@@ -51,6 +52,7 @@ struct OriginalEdgeData
     OriginalEdgeData()
         : via_node(std::numeric_limits<unsigned>::max()),
           name_id(std::numeric_limits<unsigned>::max()),
+          towns_id(std::numeric_limits<unsigned>::max()),
           turn_instruction(TurnInstruction::NoTurn), compressed_geometry(false),
           travel_mode(TRAVEL_MODE_INACCESSIBLE),
           facility(FACILITY_FORBIDDEN)
@@ -59,6 +61,7 @@ struct OriginalEdgeData
 
     NodeID via_node;
     unsigned name_id;
+    unsigned towns_id;
     TurnInstruction turn_instruction;
     bool compressed_geometry;
     TravelMode travel_mode;

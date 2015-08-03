@@ -42,9 +42,13 @@ struct SharedDataLayout
 {
     enum BlockID {
         NAME_OFFSETS = 0,
+        TOWNS_OFFSETS = 0,
         NAME_BLOCKS,
+        TOWNS_BLOCKS,
         NAME_CHAR_LIST,
+        TOWNS_CHAR_LIST,
         NAME_ID_LIST,
+        TOWNS_ID_LIST,
         VIA_NODE_LIST,
         GRAPH_NODE_LIST,
         GRAPH_EDGE_LIST,
@@ -78,6 +82,10 @@ struct SharedDataLayout
         SimpleLogger().Write(logDEBUG) << "name_blocks_size:           " << num_entries[NAME_BLOCKS];
         SimpleLogger().Write(logDEBUG) << "name_char_list_size:        " << num_entries[NAME_CHAR_LIST];
         SimpleLogger().Write(logDEBUG) << "name_id_list_size:          " << num_entries[NAME_ID_LIST];
+        SimpleLogger().Write(logDEBUG) << "towns_offsets_size:         " << num_entries[TOWNS_OFFSETS];
+        SimpleLogger().Write(logDEBUG) << "towns_blocks_size:          " << num_entries[TOWNS_BLOCKS];
+        SimpleLogger().Write(logDEBUG) << "towns_char_list_size:       " << num_entries[TOWNS_CHAR_LIST];
+        SimpleLogger().Write(logDEBUG) << "towns_id_list_size:         " << num_entries[TOWNS_ID_LIST];
         SimpleLogger().Write(logDEBUG) << "via_node_list_size:         " << num_entries[VIA_NODE_LIST];
         SimpleLogger().Write(logDEBUG) << "graph_node_list_size:       " << num_entries[GRAPH_NODE_LIST];
         SimpleLogger().Write(logDEBUG) << "graph_edge_list_size:       " << num_entries[GRAPH_EDGE_LIST];
@@ -97,6 +105,10 @@ struct SharedDataLayout
         SimpleLogger().Write(logDEBUG) << "NAME_BLOCKS          " << ": " << GetBlockSize(NAME_BLOCKS          );
         SimpleLogger().Write(logDEBUG) << "NAME_CHAR_LIST       " << ": " << GetBlockSize(NAME_CHAR_LIST       );
         SimpleLogger().Write(logDEBUG) << "NAME_ID_LIST         " << ": " << GetBlockSize(NAME_ID_LIST         );
+        SimpleLogger().Write(logDEBUG) << "TOWNS_OFFSETS        " << ": " << GetBlockSize(TOWNS_OFFSETS        );
+        SimpleLogger().Write(logDEBUG) << "TOWNS_BLOCKS         " << ": " << GetBlockSize(TOWNS_BLOCKS         );
+        SimpleLogger().Write(logDEBUG) << "TOWNS_CHAR_LIST      " << ": " << GetBlockSize(TOWNS_CHAR_LIST      );
+        SimpleLogger().Write(logDEBUG) << "TOWNS_ID_LIST        " << ": " << GetBlockSize(TOWNS_ID_LIST        );
         SimpleLogger().Write(logDEBUG) << "VIA_NODE_LIST        " << ": " << GetBlockSize(VIA_NODE_LIST        );
         SimpleLogger().Write(logDEBUG) << "GRAPH_NODE_LIST      " << ": " << GetBlockSize(GRAPH_NODE_LIST      );
         SimpleLogger().Write(logDEBUG) << "GRAPH_EDGE_LIST      " << ": " << GetBlockSize(GRAPH_EDGE_LIST      );

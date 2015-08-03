@@ -122,6 +122,7 @@ class LinearSearchNN
                 result_phantom_node = {e.forward_edge_based_node_id,
                                        e.reverse_edge_based_node_id,
                                        e.name_id,
+                                       e.towns_id,
                                        e.forward_weight,
                                        e.reverse_weight,
                                        e.forward_offset,
@@ -131,7 +132,9 @@ class LinearSearchNN
                                        nearest,
                                        e.fwd_segment_position,
                                        e.forward_travel_mode,
-                                       e.backward_travel_mode};
+                                       e.backward_travel_mode,
+                                       e.forward_facility,
+                                       e.backward_facility};
                 nearest_edge = e;
             }
         }

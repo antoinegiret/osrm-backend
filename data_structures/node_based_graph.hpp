@@ -40,7 +40,7 @@ struct NodeBasedEdgeData
 {
     NodeBasedEdgeData()
         : distance(INVALID_EDGE_WEIGHT), edgeBasedNodeID(SPECIAL_NODEID),
-          nameID(std::numeric_limits<unsigned>::max()),
+          nameID(std::numeric_limits<unsigned>::max()), townsID(std::numeric_limits<unsigned>::max()),
           isAccessRestricted(false), shortcut(false), forward(false), backward(false),
           roundabout(false), ignore_in_grid(false), travel_mode(TRAVEL_MODE_INACCESSIBLE), facility(FACILITY_FORBIDDEN)
     {
@@ -49,6 +49,7 @@ struct NodeBasedEdgeData
     int distance;
     unsigned edgeBasedNodeID;
     unsigned nameID;
+    unsigned townsID;
     bool isAccessRestricted : 1;
     bool shortcut : 1;
     bool forward : 1;
@@ -86,7 +87,7 @@ using SimpleNodeBasedDynamicGraph = DynamicGraph<SimpleEdgeData>;
 inline std::shared_ptr<NodeBasedDynamicGraph>
 NodeBasedDynamicGraphFromImportEdges(int number_of_nodes, std::vector<ImportEdge> &input_edge_list)
 {
-    static_assert(sizeof(NodeBasedEdgeData) == 16, "changing node based edge data size changes memory consumption");
+    static_assert(sizeof(NodeBasedEdgeData) == 20, "changing node based edge data size changes memory consumption");
 
     DeallocatingVector<NodeBasedDynamicGraph::InputEdge> edges_list;
     NodeBasedDynamicGraph::InputEdge edge;
@@ -118,6 +119,7 @@ NodeBasedDynamicGraphFromImportEdges(int number_of_nodes, std::vector<ImportEdge
         edge.data.roundabout = import_edge.roundabout;
         edge.data.ignore_in_grid = import_edge.in_tiny_cc;
         edge.data.nameID = import_edge.name_id;
+        edge.data.townsID = import_edge.towns_id;
         edge.data.isAccessRestricted = import_edge.access_restricted;
         edge.data.travel_mode = import_edge.travel_mode;
         edge.data.facility = import_edge.facility;
@@ -201,7 +203,7 @@ template<class SimpleEdgeT>
 inline std::shared_ptr<SimpleNodeBasedDynamicGraph>
 SimpleNodeBasedDynamicGraphFromEdges(int number_of_nodes, std::vector<SimpleEdgeT> &input_edge_list)
 {
-    static_assert(sizeof(NodeBasedEdgeData) == 16, "changing node based edge data size changes memory consumption");
+    static_assert(sizeof(NodeBasedEdgeData) == 20, "changing node based edge data size changes memory consumption");
     tbb::parallel_sort(input_edge_list.begin(), input_edge_list.end());
 
     DeallocatingVector<SimpleNodeBasedDynamicGraph::InputEdge> edges_list;

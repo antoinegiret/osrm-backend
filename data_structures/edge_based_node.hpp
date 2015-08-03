@@ -46,6 +46,7 @@ struct EdgeBasedNode
         u(SPECIAL_NODEID),
         v(SPECIAL_NODEID),
         name_id(0),
+        towns_id(0),
         forward_weight(INVALID_EDGE_WEIGHT >> 1),
         reverse_weight(INVALID_EDGE_WEIGHT >> 1),
         forward_offset(0),
@@ -65,6 +66,7 @@ struct EdgeBasedNode
         NodeID u,
         NodeID v,
         unsigned name_id,
+        unsigned towns_id,
         int forward_weight,
         int reverse_weight,
         int forward_offset,
@@ -82,6 +84,7 @@ struct EdgeBasedNode
         u(u),
         v(v),
         name_id(name_id),
+        towns_id(towns_id),
         forward_weight(forward_weight),
         reverse_weight(reverse_weight),
         forward_offset(forward_offset),
@@ -122,6 +125,7 @@ struct EdgeBasedNode
     NodeID u;   // indices into the coordinates array
     NodeID v;   // indices into the coordinates array
     unsigned name_id;   // id of the edge name
+    unsigned towns_id;   // id of the edge towns
     int forward_weight; // weight of the edge
     int reverse_weight; // weight in the other direction (may be different)
     int forward_offset; // prefix sum of the weight up the edge TODO: short must suffice

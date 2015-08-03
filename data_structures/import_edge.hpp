@@ -39,6 +39,7 @@ struct NodeBasedEdge
     explicit NodeBasedEdge(NodeID source,
                            NodeID target,
                            NodeID name_id,
+                           NodeID towns_id,
                            EdgeWeight weight,
                            bool forward,
                            bool backward,
@@ -52,6 +53,7 @@ struct NodeBasedEdge
     NodeID source;
     NodeID target;
     NodeID name_id;
+    NodeID towns_id;
     EdgeWeight weight;
     bool forward : 1;
     bool backward : 1;
