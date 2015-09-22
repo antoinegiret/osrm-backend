@@ -43,8 +43,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ExtractorCallbacks::ExtractorCallbacks(ExtractionContainers &extraction_containers,
                                        std::unordered_map<std::string, NodeID> &string_map,
+                                       std::unordered_map<std::string, NodeID> &towns_map,
                                        std::unordered_map<NodeID, FixedPointCoordinate> &coordinates_map)
-    : string_map(string_map), coordinates_map(coordinates_map), external_memory(extraction_containers)
+    : string_map(string_map), towns_map(towns_map), coordinates_map(coordinates_map), external_memory(extraction_containers)
 {
 }
 
@@ -132,16 +133,16 @@ void ExtractorCallbacks::ProcessWay(const osmium::Way &input_way, const Extracti
     }
 
     // Get the unique identifier for the street towns
-    const auto &string_map_iterator_2 = string_map.find(parsed_way.towns);
+    const auto &towns_map_iterator = towns_map.find(parsed_way.towns);
     unsigned towns_id = external_memory.towns_list.size();
-    if (string_map.end() == string_map_iterator_2)
+    if (towns_map.end() == towns_map_iterator)
     {
         external_memory.towns_list.push_back(parsed_way.towns);
-        string_map.insert(std::make_pair(parsed_way.towns, towns_id));
+        towns_map.insert(std::make_pair(parsed_way.towns, towns_id));
     }
     else
     {
-        towns_id = string_map_iterator_2->second;
+        towns_id = towns_map_iterator->second;
     }
 
     const bool split_edge = (parsed_way.forward_speed > 0) &&

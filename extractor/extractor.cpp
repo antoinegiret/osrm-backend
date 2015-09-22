@@ -111,12 +111,15 @@ int Extractor::Run(int argc, char *argv[])
 
         std::unordered_map<std::string, NodeID> string_map;
         string_map[""] = 0;
+
+        std::unordered_map<std::string, NodeID> towns_map;
+        towns_map[""] = 0;
         
         std::unordered_map<NodeID, FixedPointCoordinate> coordinates_map;
 
         ExtractionContainers extraction_containers;
         auto extractor_callbacks =
-            osrm::make_unique<ExtractorCallbacks>(extraction_containers, string_map, coordinates_map);
+            osrm::make_unique<ExtractorCallbacks>(extraction_containers, string_map, towns_map, coordinates_map);
 
         const osmium::io::File input_file(extractor_config.input_path.string());
         osmium::io::Reader reader(input_file);
