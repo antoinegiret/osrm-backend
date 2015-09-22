@@ -30,12 +30,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 struct ExtractionNode
 {
-    ExtractionNode() : traffic_lights(false), barrier(false) { }
+    ExtractionNode() : traffic_lights(false), crossing(false), barrier(false) { }
     void clear()
     {
-        traffic_lights = barrier = false;
+        traffic_lights = crossing = barrier = false;
     }
     bool traffic_lights;
+    bool crossing;
     bool barrier;
 };
 #endif // EXTRACTION_NODE_HPP

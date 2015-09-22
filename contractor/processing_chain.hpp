@@ -74,6 +74,7 @@ class Prepare
     std::vector<TurnRestriction> restriction_list;
     std::vector<NodeID> barrier_node_list;
     std::vector<NodeID> traffic_light_list;
+    std::vector<NodeID> crossing_list;
     std::vector<ImportEdge> edge_list;
 
     unsigned requested_num_threads;

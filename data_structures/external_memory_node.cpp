@@ -30,16 +30,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <limits>
 
 ExternalMemoryNode::ExternalMemoryNode(
-    int lat, int lon, double ele, unsigned int node_id, bool barrier, bool traffic_lights)
-    : QueryNode(lat, lon, ele, node_id), barrier(barrier), traffic_lights(traffic_lights)
+    int lat, int lon, double ele, unsigned int node_id, bool barrier, bool traffic_lights, bool crossing)
+    : QueryNode(lat, lon, ele, node_id), barrier(barrier), traffic_lights(traffic_lights), crossing(crossing)
 {
 }
 
-ExternalMemoryNode::ExternalMemoryNode() : barrier(false), traffic_lights(false) {}
+ExternalMemoryNode::ExternalMemoryNode() : barrier(false), traffic_lights(false), crossing(false) {}
 
 ExternalMemoryNode ExternalMemoryNode::min_value()
 {
-    return ExternalMemoryNode(0, 0, 0.0, 0, false, false);
+    return ExternalMemoryNode(0, 0, 0.0, 0, false, false, false);
 }
 
 ExternalMemoryNode ExternalMemoryNode::max_value()
@@ -48,6 +48,7 @@ ExternalMemoryNode ExternalMemoryNode::max_value()
                               std::numeric_limits<int>::max(),
                               std::numeric_limits<double>::max(),
                               std::numeric_limits<unsigned>::max(),
+                              false,
                               false,
                               false);
 }

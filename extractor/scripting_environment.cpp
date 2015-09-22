@@ -96,6 +96,7 @@ void ScriptingEnvironment::init_lua_state(lua_State* lua_state)
 
         luabind::class_<ExtractionNode>("ResultNode")
         .def_readwrite("traffic_lights", &ExtractionNode::traffic_lights)
+        .def_readwrite("crossing", &ExtractionNode::crossing)
         .def_readwrite("barrier", &ExtractionNode::barrier),
 
         luabind::class_<ExtractionWay>("ResultWay")

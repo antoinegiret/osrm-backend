@@ -45,6 +45,7 @@ EdgeBasedGraphFactory::EdgeBasedGraphFactory(
     std::unique_ptr<RestrictionMap> restriction_map,
     std::vector<NodeID> &barrier_node_list,
     std::vector<NodeID> &traffic_light_node_list,
+    std::vector<NodeID> &crossing_node_list,
     std::vector<QueryNode> &node_info_list,
     SpeedProfileProperties &speed_profile)
     : speed_profile(speed_profile),
@@ -55,6 +56,7 @@ EdgeBasedGraphFactory::EdgeBasedGraphFactory(
     // insert into unordered sets for fast lookup
     m_barrier_nodes.insert(barrier_node_list.begin(), barrier_node_list.end());
     m_traffic_lights.insert(traffic_light_node_list.begin(), traffic_light_node_list.end());
+    m_crossings.insert(crossing_node_list.begin(), crossing_node_list.end());
 }
 
 void EdgeBasedGraphFactory::GetEdgeBasedEdges(DeallocatingVector<EdgeBasedEdge> &output_edge_list)
@@ -374,6 +376,9 @@ void EdgeBasedGraphFactory::CompressGeometry()
             const bool add_traffic_signal_penalty =
                 (m_traffic_lights.find(node_v) != m_traffic_lights.end());
 
+            const bool add_crossing_penalty =
+                    (m_crossings.find(node_v) != m_crossings.end());
+
             // add weight of e2's to e1
             m_node_based_graph->GetEdgeData(forward_e1).distance += fwd_edge_data2.distance;
             m_node_based_graph->GetEdgeData(reverse_e1).distance += rev_edge_data2.distance;
@@ -383,6 +388,13 @@ void EdgeBasedGraphFactory::CompressGeometry()
                     speed_profile.traffic_signal_penalty;
                 m_node_based_graph->GetEdgeData(reverse_e1).distance +=
                     speed_profile.traffic_signal_penalty;
+            }
+            if (add_crossing_penalty)
+            {
+                m_node_based_graph->GetEdgeData(forward_e1).distance +=
+                        speed_profile.crossing_penalty;
+                m_node_based_graph->GetEdgeData(reverse_e1).distance +=
+                        speed_profile.crossing_penalty;
             }
 
             // extend e1's to targets of e2's
@@ -411,7 +423,8 @@ void EdgeBasedGraphFactory::CompressGeometry()
                 node_v,
                 node_w,
                 forward_weight1 +
-                    (add_traffic_signal_penalty ? speed_profile.traffic_signal_penalty : 0),
+                    (add_traffic_signal_penalty ? speed_profile.traffic_signal_penalty : 0) +
+                        (add_crossing_penalty ? speed_profile.crossing_penalty : 0),
                 forward_weight2);
             m_geometry_compressor.CompressEdge(
                 reverse_e1,
@@ -420,7 +433,8 @@ void EdgeBasedGraphFactory::CompressGeometry()
                 node_u,
                 reverse_weight1,
                 reverse_weight2 +
-                    (add_traffic_signal_penalty ? speed_profile.traffic_signal_penalty : 0));
+                    (add_traffic_signal_penalty ? speed_profile.traffic_signal_penalty : 0) +
+                        (add_crossing_penalty ? speed_profile.crossing_penalty : 0));
             ++removed_node_count;
 
             BOOST_ASSERT(m_node_based_graph->GetEdgeData(forward_e1).nameID ==
@@ -650,6 +664,10 @@ EdgeBasedGraphFactory::GenerateEdgeExpandedEdges(const std::string &original_edg
                 if (m_traffic_lights.find(v) != m_traffic_lights.end())
                 {
                     distance += speed_profile.traffic_signal_penalty;
+                }
+                if (m_crossings.find(v) != m_crossings.end())
+                {
+                    distance += speed_profile.crossing_penalty;
                 }
 
                 // unpack last node of first segment if packed

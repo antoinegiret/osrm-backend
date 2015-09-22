@@ -143,6 +143,7 @@ int Prepare::Process(int argc, char *argv[])
                                       edge_list,
                                       barrier_node_list,
                                       traffic_light_list,
+                                      crossing_list,
                                       &internal_to_external_node_map,
                                       restriction_list);
     input_stream.close();
@@ -155,7 +156,8 @@ int Prepare::Process(int argc, char *argv[])
 
     SimpleLogger().Write() << restriction_list.size() << " restrictions, "
                            << barrier_node_list.size() << " bollard nodes, "
-                           << traffic_light_list.size() << " traffic lights";
+                           << traffic_light_list.size() << " traffic lights, "
+                           << crossing_list.size() << " crossings";
 
     std::vector<EdgeBasedNode> node_based_edge_list;
     unsigned number_of_edge_based_nodes = 0;
@@ -484,6 +486,15 @@ Prepare::SetupScriptingEnvironment(lua_State *lua_state,
     SimpleLogger().Write(logDEBUG)
         << "traffic_signal_penalty: " << speed_profile.traffic_signal_penalty;
 
+    if (0 != luaL_dostring(lua_state, "return crossing_penalty\n"))
+    {
+        std::cerr << lua_tostring(lua_state, -1) << " occured in scripting block" << std::endl;
+        return false;
+    }
+    speed_profile.crossing_penalty = 10 * lua_tointeger(lua_state, -1);
+    SimpleLogger().Write(logDEBUG)
+    << "crossing_penalty: " << speed_profile.crossing_penalty;
+
     if (0 != luaL_dostring(lua_state, "return u_turn_penalty\n"))
     {
         std::cerr << lua_tostring(lua_state, -1) << " occured in scripting block" << std::endl;
@@ -515,6 +526,7 @@ Prepare::BuildEdgeExpandedGraph(lua_State *lua_state,
                                                 std::move(restriction_map),
                                                 barrier_node_list,
                                                 traffic_light_list,
+                                                crossing_list,
                                                 internal_to_external_node_map,
                                                 speed_profile);
     edge_list.clear();
@@ -528,6 +540,8 @@ Prepare::BuildEdgeExpandedGraph(lua_State *lua_state,
     barrier_node_list.shrink_to_fit();
     traffic_light_list.clear();
     traffic_light_list.shrink_to_fit();
+    crossing_list.clear();
+    crossing_list.shrink_to_fit();
 
     const std::size_t number_of_edge_based_nodes =
         edge_based_graph_factory->GetNumberOfEdgeBasedNodes();

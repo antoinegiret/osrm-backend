@@ -63,6 +63,7 @@ class EdgeBasedGraphFactory
                                    std::unique_ptr<RestrictionMap> restricion_map,
                                    std::vector<NodeID> &barrier_node_list,
                                    std::vector<NodeID> &traffic_light_node_list,
+                                   std::vector<NodeID> &crossing_node_list,
                                    std::vector<QueryNode> &node_info_list,
                                    SpeedProfileProperties &speed_profile);
 
@@ -83,11 +84,12 @@ class EdgeBasedGraphFactory
     struct SpeedProfileProperties
     {
         SpeedProfileProperties()
-            : traffic_signal_penalty(0), u_turn_penalty(0), has_turn_penalty_function(false)
+            : traffic_signal_penalty(0), crossing_penalty(0), u_turn_penalty(0), has_turn_penalty_function(false)
         {
         }
 
         int traffic_signal_penalty;
+        int crossing_penalty;
         int u_turn_penalty;
         bool has_turn_penalty_function;
     } speed_profile;
@@ -104,6 +106,7 @@ class EdgeBasedGraphFactory
     std::shared_ptr<NodeBasedDynamicGraph> m_node_based_graph;
     std::unordered_set<NodeID> m_barrier_nodes;
     std::unordered_set<NodeID> m_traffic_lights;
+    std::unordered_set<NodeID> m_crossings;
 
     std::unique_ptr<RestrictionMap> m_restriction_map;
 

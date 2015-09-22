@@ -55,6 +55,7 @@ std::vector<QueryNode> coordinate_list;
 std::vector<TurnRestriction> restriction_list;
 std::vector<NodeID> bollard_node_list;
 std::vector<NodeID> traffic_lights_list;
+std::vector<NodeID> crossings_list;
 
 struct TarjanEdgeData
 {
@@ -129,6 +130,7 @@ int main(int argc, char *argv[])
                                                                      edge_list,
                                                                      bollard_node_list,
                                                                      traffic_lights_list,
+                                                                     crossings_list,
                                                                      &coordinate_list,
                                                                      restriction_list);
         input_stream.close();
@@ -139,10 +141,13 @@ int main(int argc, char *argv[])
 
         SimpleLogger().Write() << restriction_list.size() << " restrictions, "
                                << bollard_node_list.size() << " bollard nodes, "
-                               << traffic_lights_list.size() << " traffic lights";
+                               << traffic_lights_list.size() << " traffic lights, "
+                               << crossings_list.size() << " crossing";
 
         traffic_lights_list.clear();
         traffic_lights_list.shrink_to_fit();
+        crossings_list.clear();
+        crossings_list.shrink_to_fit();
 
         // Building an node-based graph
         DeallocatingVector<TarjanEdge> graph_edge_list;
