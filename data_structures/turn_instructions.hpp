@@ -33,7 +33,7 @@ enum class TurnInstruction : unsigned char
     NoTurn = 0, GoStraight, TurnSlightRight, TurnRight, TurnSharpRight, UTurn,
     TurnSharpLeft, TurnLeft, TurnSlightLeft, ReachViaLocation, HeadOn, EnterRoundAbout,
     LeaveRoundAbout, StayOnRoundAbout, StartAtEndOfStreet, ReachedYourDestination,
-    EnterAgainstAllowedDirection, LeaveAgainstAllowedDirection,
+    EnterAgainstAllowedDirection, LeaveAgainstAllowedDirection, Crossing, Elevator,
     InverseAccessRestrictionFlag = 127,
     AccessRestrictionFlag = 128,
     AccessRestrictionPenalty = 129

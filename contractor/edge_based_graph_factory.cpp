@@ -46,6 +46,7 @@ EdgeBasedGraphFactory::EdgeBasedGraphFactory(
     std::vector<NodeID> &barrier_node_list,
     std::vector<NodeID> &traffic_light_node_list,
     std::vector<NodeID> &crossing_node_list,
+    std::vector<NodeID> &elevator_node_list,
     std::vector<QueryNode> &node_info_list,
     SpeedProfileProperties &speed_profile)
     : speed_profile(speed_profile),
@@ -57,6 +58,7 @@ EdgeBasedGraphFactory::EdgeBasedGraphFactory(
     m_barrier_nodes.insert(barrier_node_list.begin(), barrier_node_list.end());
     m_traffic_lights.insert(traffic_light_node_list.begin(), traffic_light_node_list.end());
     m_crossings.insert(crossing_node_list.begin(), crossing_node_list.end());
+    m_elevators.insert(elevator_node_list.begin(), elevator_node_list.end());
 }
 
 void EdgeBasedGraphFactory::GetEdgeBasedEdges(DeallocatingVector<EdgeBasedEdge> &output_edge_list)
@@ -379,6 +381,9 @@ void EdgeBasedGraphFactory::CompressGeometry()
             const bool add_crossing_penalty =
                     (m_crossings.find(node_v) != m_crossings.end());
 
+            const bool add_elevator_penalty =
+                    (m_elevators.find(node_v) != m_elevators.end());
+
             // add weight of e2's to e1
             m_node_based_graph->GetEdgeData(forward_e1).distance += fwd_edge_data2.distance;
             m_node_based_graph->GetEdgeData(reverse_e1).distance += rev_edge_data2.distance;
@@ -395,6 +400,13 @@ void EdgeBasedGraphFactory::CompressGeometry()
                         speed_profile.crossing_penalty;
                 m_node_based_graph->GetEdgeData(reverse_e1).distance +=
                         speed_profile.crossing_penalty;
+            }
+            if (add_elevator_penalty)
+            {
+                m_node_based_graph->GetEdgeData(forward_e1).distance +=
+                        speed_profile.elevator_penalty;
+                m_node_based_graph->GetEdgeData(reverse_e1).distance +=
+                        speed_profile.elevator_penalty;
             }
 
             // extend e1's to targets of e2's
@@ -423,8 +435,9 @@ void EdgeBasedGraphFactory::CompressGeometry()
                 node_v,
                 node_w,
                 forward_weight1 +
-                    (add_traffic_signal_penalty ? speed_profile.traffic_signal_penalty : 0) +
-                        (add_crossing_penalty ? speed_profile.crossing_penalty : 0),
+                        (add_traffic_signal_penalty ? speed_profile.traffic_signal_penalty : 0) +
+                        (add_crossing_penalty ? speed_profile.crossing_penalty : 0) +
+                        (add_elevator_penalty ? speed_profile.elevator_penalty : 0),
                 forward_weight2);
             m_geometry_compressor.CompressEdge(
                 reverse_e1,
@@ -433,12 +446,14 @@ void EdgeBasedGraphFactory::CompressGeometry()
                 node_u,
                 reverse_weight1,
                 reverse_weight2 +
-                    (add_traffic_signal_penalty ? speed_profile.traffic_signal_penalty : 0) +
-                        (add_crossing_penalty ? speed_profile.crossing_penalty : 0));
+                        (add_traffic_signal_penalty ? speed_profile.traffic_signal_penalty : 0) +
+                        (add_crossing_penalty ? speed_profile.crossing_penalty : 0) +
+                        (add_elevator_penalty ? speed_profile.elevator_penalty : 0)
+                );
             ++removed_node_count;
 
-            BOOST_ASSERT(m_node_based_graph->GetEdgeData(forward_e1).nameID ==
-                         m_node_based_graph->GetEdgeData(reverse_e1).nameID);
+            /*BOOST_ASSERT(m_node_based_graph->GetEdgeData(forward_e1).nameID ==
+                         m_node_based_graph->GetEdgeData(reverse_e1).nameID);*/
         }
     }
     SimpleLogger().Write() << "removed " << removed_node_count << " nodes";
@@ -669,6 +684,10 @@ EdgeBasedGraphFactory::GenerateEdgeExpandedEdges(const std::string &original_edg
                 {
                     distance += speed_profile.crossing_penalty;
                 }
+                if (m_elevators.find(v) != m_elevators.end())
+                {
+                    distance += speed_profile.elevator_penalty;
+                }
 
                 // unpack last node of first segment if packed
                 const auto first_coordinate = m_node_info_list[(m_geometry_compressor.HasEntryForID(e1) ?
@@ -764,6 +783,16 @@ TurnInstruction EdgeBasedGraphFactory::AnalyzeTurn(const NodeID node_u,
                                                    const double angle)
     const
 {
+    if (m_crossings.find(node_v) != m_crossings.end())
+    {
+        return TurnInstruction::Crossing;
+    }
+
+    if (m_elevators.find(node_v) != m_elevators.end())
+    {
+        return TurnInstruction::Elevator;
+    }
+
     if (node_u == node_w)
     {
         return TurnInstruction::UTurn;

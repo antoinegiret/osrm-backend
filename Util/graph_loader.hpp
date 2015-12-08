@@ -58,6 +58,7 @@ NodeID readBinaryOSRMGraphFromStream(std::istream &input_stream,
                                      std::vector<NodeID> &barrier_node_list,
                                      std::vector<NodeID> &traffic_light_node_list,
                                      std::vector<NodeID> &crossing_node_list,
+                                     std::vector<NodeID> &elevator_node_list,
                                      std::vector<QueryNode> *int_to_ext_node_id_map,
                                      std::vector<TurnRestriction> &restriction_list)
 {
@@ -95,12 +96,17 @@ NodeID readBinaryOSRMGraphFromStream(std::istream &input_stream,
         {
             crossing_node_list.emplace_back(i);
         }
+        if (current_node.elevator)
+        {
+            elevator_node_list.emplace_back(i);
+        }
     }
 
     // tighten vector sizes
     barrier_node_list.shrink_to_fit();
     traffic_light_node_list.shrink_to_fit();
     crossing_node_list.shrink_to_fit();
+    elevator_node_list.shrink_to_fit();
 
     // renumber nodes in turn restrictions
     for (TurnRestriction &current_restriction : restriction_list)

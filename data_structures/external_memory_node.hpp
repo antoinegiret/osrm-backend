@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 struct ExternalMemoryNode : QueryNode
 {
-    ExternalMemoryNode(int lat, int lon, double ele, NodeID id, bool barrier, bool traffic_light, bool crossing);
+    ExternalMemoryNode(int lat, int lon, double ele, NodeID id, bool barrier, bool traffic_light, bool crossing, bool elevator);
 
     ExternalMemoryNode();
 
@@ -45,6 +45,7 @@ struct ExternalMemoryNode : QueryNode
     bool barrier;
     bool traffic_lights;
     bool crossing;
+    bool elevator;
 };
 
 struct ExternalMemoryNodeSTXXLCompare

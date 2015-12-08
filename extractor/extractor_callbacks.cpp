@@ -66,7 +66,8 @@ void ExtractorCallbacks::ProcessNode(const osmium::Node &input_node,
         static_cast<NodeID>(input_node.id()),
         result_node.barrier,
         result_node.traffic_lights,
-        result_node.crossing
+        result_node.crossing,
+        result_node.elevator
     });
 }
 
