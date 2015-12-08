@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 RouteParameters::RouteParameters()
     : zoom_level(18), print_instructions(false), alternate_route(true), geometry(true),
-      compression(true), deprecatedAPI(false), uturn_default(false), check_sum(-1), num_results(1)
+      compression(true), elevations(true), deprecatedAPI(false), uturn_default(false), check_sum(-1), num_results(1)
 {
 }
 
@@ -107,6 +107,8 @@ void RouteParameters::setLanguage(const std::string &language_string)
 void RouteParameters::setGeometryFlag(const bool flag) { geometry = flag; }
 
 void RouteParameters::setCompressionFlag(const bool flag) { compression = flag; }
+
+void RouteParameters::setElevationsFlag(const bool flag) { elevations = flag; }
 
 void
 RouteParameters::addCoordinate(const boost::fusion::vector<double, double> &transmitted_coordinates)

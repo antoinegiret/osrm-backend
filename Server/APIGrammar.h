@@ -40,7 +40,7 @@ struct APIGrammar : qi::grammar<Iterator>
     explicit APIGrammar(HandlerT * h) : APIGrammar::base_type(api_call), handler(h)
     {
         api_call = qi::lit('/') >> string[boost::bind(&HandlerT::setService, handler, ::_1)] >> *(query) >> -(uturns);
-        query    = ('?') >> (+(zoom | output | jsonp | checksum | location | hint | u | cmp | language | instruction | geometry | alt_route | old_API | num_results) ) ;
+        query    = ('?') >> (+(zoom | output | jsonp | checksum | location | hint | u | cmp | language | instruction | geometry | elevations | alt_route | old_API | num_results) ) ;
 
         zoom        = (-qi::lit('&')) >> qi::lit('z')            >> '=' >> qi::short_[boost::bind(&HandlerT::setZoomLevel, handler, ::_1)];
         output      = (-qi::lit('&')) >> qi::lit("output")       >> '=' >> string[boost::bind(&HandlerT::setOutputFormat, handler, ::_1)];
@@ -49,6 +49,7 @@ struct APIGrammar : qi::grammar<Iterator>
         instruction = (-qi::lit('&')) >> qi::lit("instructions") >> '=' >> qi::bool_[boost::bind(&HandlerT::setInstructionFlag, handler, ::_1)];
         geometry    = (-qi::lit('&')) >> qi::lit("geometry")     >> '=' >> qi::bool_[boost::bind(&HandlerT::setGeometryFlag, handler, ::_1)];
         cmp         = (-qi::lit('&')) >> qi::lit("compression")  >> '=' >> qi::bool_[boost::bind(&HandlerT::setCompressionFlag, handler, ::_1)];
+        elevations  = (-qi::lit('&')) >> qi::lit("elevations")   >> '=' >> qi::bool_[boost::bind(&HandlerT::setElevationsFlag, handler, ::_1)];
         location    = (-qi::lit('&')) >> qi::lit("loc")          >> '=' >> (qi::double_ >> qi::lit(',') >> qi::double_)[boost::bind(&HandlerT::addCoordinate, handler, ::_1)];
         hint        = (-qi::lit('&')) >> qi::lit("hint")         >> '=' >> stringwithDot[boost::bind(&HandlerT::addHint, handler, ::_1)];
         u           = (-qi::lit('&')) >> qi::lit("u")            >> '=' >> qi::bool_[boost::bind(&HandlerT::setUTurn, handler, ::_1)];
@@ -65,7 +66,7 @@ struct APIGrammar : qi::grammar<Iterator>
 
     qi::rule<Iterator> api_call, query;
     qi::rule<Iterator, std::string()> service, zoom, output, string, jsonp, checksum, location, hint,
-                                      stringwithDot, stringwithPercent, language, instruction, geometry,
+                                      stringwithDot, stringwithPercent, language, instruction, geometry, elevations,
                                       cmp, alt_route, u, uturns, old_API, num_results;
 
     HandlerT * handler;

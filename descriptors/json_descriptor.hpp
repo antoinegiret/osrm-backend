@@ -142,12 +142,15 @@ template <class DataFacadeT> class JSONDescriptor final : public BaseDescriptor<
                 description_factory.AppendGeometryString(config.encode_geometry);
             json_result.values["route_geometry"] = route_geometry;
         }
-        
-        JSON::Array json_route_elevations;
-        BuildElevationArray(description_factory,
-                            json_route_elevations,
-                            raw_route.segment_end_coordinates.back().target_phantom.location.ele);
-        json_result.values["route_elevations"] = json_route_elevations;
+
+        if (config.elevations)
+        {
+            JSON::Array json_route_elevations;
+            BuildElevationArray(description_factory,
+                                json_route_elevations,
+                                raw_route.segment_end_coordinates.back().target_phantom.location.ele);
+            json_result.values["route_elevations"] = json_route_elevations;
+        }
         
         if (config.instructions)
         {
@@ -236,12 +239,14 @@ template <class DataFacadeT> class JSONDescriptor final : public BaseDescriptor<
                 json_alternate_geometries_array.values.push_back(alternate_geometry_string);
                 json_result.values["alternative_geometries"] = json_alternate_geometries_array;
             }
-            
-            JSON::Array json_alt_elevations;
-			BuildElevationArray(alternate_description_factory,
-								json_alt_elevations,
-								raw_route.segment_end_coordinates.back().target_phantom.location.ele);
-			json_result.values["alternative_elevations"] = json_alt_elevations;
+
+            if (config.elevations) {
+                JSON::Array json_alt_elevations;
+                BuildElevationArray(alternate_description_factory,
+                                    json_alt_elevations,
+                                    raw_route.segment_end_coordinates.back().target_phantom.location.ele);
+                json_result.values["alternative_elevations"] = json_alt_elevations;
+            }
             
             // Generate instructions for each alternative (simulated here)
             JSON::Array json_alt_instructions;

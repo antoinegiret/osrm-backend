@@ -69,6 +69,8 @@ struct RouteParameters
 
     void setCompressionFlag(const bool flag);
 
+    void setElevationsFlag(const bool flag);
+
     void addCoordinate(const boost::fusion::vector<double, double> &coordinates);
 
     short zoom_level;
@@ -76,6 +78,7 @@ struct RouteParameters
     bool alternate_route;
     bool geometry;
     bool compression;
+    bool elevations;
     bool deprecatedAPI;
     bool uturn_default;
     unsigned check_sum;
