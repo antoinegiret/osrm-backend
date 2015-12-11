@@ -378,7 +378,8 @@ template <class DataFacadeT> class JSONDescriptor final : public BaseDescriptor<
                     else if (TurnInstruction::Elevator == current_instruction)
                     {
                         JSON::Array json_tmp_instruction_row;
-                        json_tmp_instruction_row.values.push_back(current_turn_instruction);
+                        temp_instruction = cast::integral_to_string(cast::enum_to_underlying(current_instruction));
+                        json_tmp_instruction_row.values.push_back(temp_instruction);
                         json_tmp_instruction_row.values.push_back("");
                         json_tmp_instruction_row.values.push_back(0);
                         json_tmp_instruction_row.values.push_back(necessary_segments_running_index);
