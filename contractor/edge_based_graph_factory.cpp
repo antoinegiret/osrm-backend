@@ -783,10 +783,10 @@ TurnInstruction EdgeBasedGraphFactory::AnalyzeTurn(const NodeID node_u,
                                                    const double angle)
     const
 {
-    if (m_crossings.find(node_v) != m_crossings.end())
+    /*if (m_crossings.find(node_v) != m_crossings.end())
     {
         return TurnInstruction::Crossing;
-    }
+    }*/
 
     if (m_elevators.find(node_v) != m_elevators.end())
     {
