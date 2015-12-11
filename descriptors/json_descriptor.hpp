@@ -375,13 +375,33 @@ template <class DataFacadeT> class JSONDescriptor final : public BaseDescriptor<
                         current_turn_instruction += temp_instruction;
                         round_about.leave_at_exit = 0;
                     }
+                    else if (TurnInstruction::Elevator == current_instruction)
+                    {
+                        JSON::Array json_tmp_instruction_row;
+                        json_tmp_instruction_row.values.push_back(current_turn_instruction);
+                        json_tmp_instruction_row.values.push_back("");
+                        json_tmp_instruction_row.values.push_back(0);
+                        json_tmp_instruction_row.values.push_back(necessary_segments_running_index);
+                        json_tmp_instruction_row.values.push_back(0);
+                        json_tmp_instruction_row.values.push_back("0m");
+                        json_tmp_instruction_row.values.push_back(Bearing::Get(0.0));
+                        json_tmp_instruction_row.values.push_back(0.);
+                        json_tmp_instruction_row.values.push_back(1);
+                        json_tmp_instruction_row.values.push_back(1);
+                        json_tmp_instruction_row.values.push_back("");
+                        json_instruction_array.values.push_back(json_tmp_instruction_row);
+
+                        current_instruction = TurnInstruction::GoStraight;
+                        temp_instruction = cast::integral_to_string(cast::enum_to_underlying(current_instruction));
+                        current_turn_instruction += temp_instruction;
+                    }
                     else
                     {
                         temp_instruction = cast::integral_to_string(cast::enum_to_underlying(current_instruction));
                         current_turn_instruction += temp_instruction;
                     }
-                    json_instruction_row.values.push_back(current_turn_instruction);
 
+                    json_instruction_row.values.push_back(current_turn_instruction);
                     json_instruction_row.values.push_back(current_name);
                     json_instruction_row.values.push_back(std::round(segment.length));
                     json_instruction_row.values.push_back(necessary_segments_running_index);
