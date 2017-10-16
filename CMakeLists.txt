@@ -192,6 +192,7 @@ endif()
 
 if(UNIX AND NOT APPLE)
   target_link_libraries(osrm-prepare rt)
+  target_link_libraries(osrm-extract gomp)
   target_link_libraries(osrm-datastore rt)
   target_link_libraries(OSRM rt)
 endif()
