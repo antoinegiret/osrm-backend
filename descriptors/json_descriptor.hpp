@@ -457,16 +457,36 @@ template <class DataFacadeT> class JSONDescriptor final : public BaseDescriptor<
 		
 		unsigned necessary_segments_running_index = 0;
 		double temp_dist = 0.0;
+        double last_valid_ele = -10;
 		
-		for (const SegmentInformation &segment : description_factory.path_description)
+		for (unsigned i = 0; i < description_factory.path_description.size(); ++i)
         {
+            const SegmentInformation &segment = description_factory.path_description[i];
 			JSON::Array json_elevation_row;
 			
 			TurnInstruction current_instruction = segment.turn_instruction;
             if (TurnInstructionsClass::TurnIsNecessary(current_instruction))
             {
 				json_elevation_row.values.push_back(temp_dist);
-				json_elevation_row.values.push_back(segment.location.ele);
+
+                if (segment.location.ele > -10) {
+                    json_elevation_row.values.push_back(segment.location.ele);
+                    last_valid_ele = segment.location.ele;
+                } else {
+                    if (last_valid_ele > -10) {
+                        json_elevation_row.values.push_back(last_valid_ele);
+                    } else {
+                        double ele = target_ele;
+                        for (unsigned j = i + 1; j < description_factory.path_description.size(); ++j) {
+                            if (description_factory.path_description[j].location.ele > -10) {
+                                ele = description_factory.path_description[j].location.ele;
+                                break;
+                            }
+                        }
+                        json_elevation_row.values.push_back(ele);
+                    }
+                }
+
 				json_elevation_row.values.push_back(necessary_segments_running_index);
 				
 				json_route_elevations.values.push_back(json_elevation_row);
@@ -489,17 +509,18 @@ template <class DataFacadeT> class JSONDescriptor final : public BaseDescriptor<
 	inline void BuildVerticalGain(DescriptionFactory &description_factory,
                                   double &vertical_gain,
                                   const double target_ele) {
-
-        double current_ele, next_ele, diff_ele, alpha;
-
         for (unsigned i = 0; i < description_factory.path_description.size(); ++i) {
-            current_ele = description_factory.path_description[i].location.ele;
-            next_ele = i != description_factory.path_description.size() - 1 ? description_factory.path_description[i + 1].location.ele : target_ele;
-            diff_ele = next_ele - current_ele;
-            alpha = diff_ele / description_factory.path_description[i].length;
-            if(alpha >= 0.05)
-            {
-                vertical_gain += diff_ele;
+            const double current_ele = description_factory.path_description[i].location.ele;
+            const double next_ele = i != description_factory.path_description.size() - 1 ?
+                                    description_factory.path_description[i + 1].location.ele :
+                                    target_ele;
+            if (current_ele > -10 && next_ele > -10) {
+                const double diff_ele = next_ele - current_ele;
+                const double alpha = diff_ele / description_factory.path_description[i].length;
+                if (alpha >= 0.05)
+                {
+                    vertical_gain += diff_ele;
+                }
             }
         }
 	}
