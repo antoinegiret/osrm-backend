@@ -56,6 +56,7 @@ class ExtractionContainers
     STXXLEdgeVector all_edges_list;
     STXXLStringVector name_list;
     STXXLStringVector towns_list;
+    STXXLStringVector bike_routes_list;
     STXXLRestrictionsVector restrictions_list;
     STXXLWayIDStartEndVector way_start_end_id_list;
     const FingerPrint fingerprint;

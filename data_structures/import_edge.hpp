@@ -40,6 +40,7 @@ struct NodeBasedEdge
                            NodeID target,
                            NodeID name_id,
                            NodeID towns_id,
+                           NodeID bike_routes_id,
                            EdgeWeight weight,
                            bool forward,
                            bool backward,
@@ -54,6 +55,7 @@ struct NodeBasedEdge
     NodeID target;
     NodeID name_id;
     NodeID towns_id;
+    NodeID bike_routes_id;
     EdgeWeight weight;
     bool forward : 1;
     bool backward : 1;

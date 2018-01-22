@@ -123,6 +123,7 @@ class LinearSearchNN
                                        e.reverse_edge_based_node_id,
                                        e.name_id,
                                        e.towns_id,
+                                       e.bike_routes_id,
                                        e.forward_weight,
                                        e.reverse_weight,
                                        e.forward_offset,

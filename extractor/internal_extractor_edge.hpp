@@ -38,8 +38,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 struct InternalExtractorEdge
 {
     InternalExtractorEdge()
-        : start(0), target(0), direction(0), speed(0), name_id(0), towns_id(0), is_roundabout(false),
-          is_in_tiny_cc(false), is_duration_set(false), is_access_restricted(false),
+        : start(0), target(0), direction(0), speed(0), name_id(0), towns_id(0), bike_routes_id(0),
+          is_roundabout(false), is_in_tiny_cc(false), is_duration_set(false), is_access_restricted(false),
           travel_mode(TRAVEL_MODE_INACCESSIBLE), is_split(false), facility(FACILITY_FORBIDDEN)
     {
     }
@@ -50,6 +50,7 @@ struct InternalExtractorEdge
                                    double speed,
                                    unsigned name_id,
                                    unsigned towns_id,
+                                   unsigned bike_routes_id,
                                    bool is_roundabout,
                                    bool is_in_tiny_cc,
                                    bool is_duration_set,
@@ -58,7 +59,8 @@ struct InternalExtractorEdge
                                    bool is_split,
                                    Facility facility)
         : start(start), target(target), direction(direction), speed(speed),
-          name_id(name_id), towns_id(towns_id), is_roundabout(is_roundabout), is_in_tiny_cc(is_in_tiny_cc),
+          name_id(name_id), towns_id(towns_id), bike_routes_id(bike_routes_id),
+          is_roundabout(is_roundabout), is_in_tiny_cc(is_in_tiny_cc),
           is_duration_set(is_duration_set), is_access_restricted(is_access_restricted),
           travel_mode(travel_mode), is_split(is_split), facility(facility)
     {
@@ -67,12 +69,12 @@ struct InternalExtractorEdge
     // necessary static util functions for stxxl's sorting
     static InternalExtractorEdge min_value()
     {
-        return InternalExtractorEdge(0, 0, 0, 0, 0, 0, false, false, false, false, TRAVEL_MODE_INACCESSIBLE, false, FACILITY_FORBIDDEN);
+        return InternalExtractorEdge(0, 0, 0, 0, 0, 0, 0, false, false, false, false, TRAVEL_MODE_INACCESSIBLE, false, FACILITY_FORBIDDEN);
     }
     static InternalExtractorEdge max_value()
     {
         return InternalExtractorEdge(
-            SPECIAL_NODEID, SPECIAL_NODEID, 0, 0, 0, 0, false, false, false, false, TRAVEL_MODE_INACCESSIBLE, false, FACILITY_FORBIDDEN);
+            SPECIAL_NODEID, SPECIAL_NODEID, 0, 0, 0, 0, 0, false, false, false, false, TRAVEL_MODE_INACCESSIBLE, false, FACILITY_FORBIDDEN);
     }
 
     NodeID start;
@@ -81,6 +83,7 @@ struct InternalExtractorEdge
     double speed;
     unsigned name_id;
     unsigned towns_id;
+    unsigned bike_routes_id;
     bool is_roundabout;
     bool is_in_tiny_cc;
     bool is_duration_set;

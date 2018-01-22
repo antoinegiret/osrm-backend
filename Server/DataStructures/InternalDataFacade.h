@@ -66,11 +66,13 @@ template <class EdgeDataT> class InternalDataFacade : public BaseDataFacade<Edge
     ShM<NodeID, false>::vector m_via_node_list;
     ShM<unsigned, false>::vector m_name_ID_list;
     ShM<unsigned, false>::vector m_towns_ID_list;
+    ShM<unsigned, false>::vector m_bike_routes_ID_list;
     ShM<TurnInstruction, false>::vector m_turn_instruction_list;
     ShM<TravelMode, false>::vector m_travel_mode_list;
     ShM<Facility, false>::vector m_facility_list;
     ShM<char, false>::vector m_names_char_list;
     ShM<char, false>::vector m_towns_char_list;
+    ShM<char, false>::vector m_bike_routes_char_list;
     ShM<bool, false>::vector m_edge_is_compressed;
     ShM<unsigned, false>::vector m_geometry_indices;
     ShM<unsigned, false>::vector m_geometry_list;
@@ -81,6 +83,7 @@ template <class EdgeDataT> class InternalDataFacade : public BaseDataFacade<Edge
     boost::filesystem::path file_index_path;
     RangeTable<16, false> m_name_table;
     RangeTable<16, false> m_towns_table;
+    RangeTable<16, false> m_bike_routes_table;
 
     void LoadTimestamp(const boost::filesystem::path &timestamp_path)
     {
@@ -150,6 +153,7 @@ template <class EdgeDataT> class InternalDataFacade : public BaseDataFacade<Edge
         m_via_node_list.resize(number_of_edges);
         m_name_ID_list.resize(number_of_edges);
         m_towns_ID_list.resize(number_of_edges);
+        m_bike_routes_ID_list.resize(number_of_edges);
         m_turn_instruction_list.resize(number_of_edges);
         m_travel_mode_list.resize(number_of_edges);
         m_facility_list.resize(number_of_edges);
@@ -164,6 +168,7 @@ template <class EdgeDataT> class InternalDataFacade : public BaseDataFacade<Edge
             m_via_node_list[i] = current_edge_data.via_node;
             m_name_ID_list[i] = current_edge_data.name_id;
             m_towns_ID_list[i] = current_edge_data.towns_id;
+            m_bike_routes_ID_list[i] = current_edge_data.bike_routes_id;
             m_turn_instruction_list[i] = current_edge_data.turn_instruction;
             m_travel_mode_list[i] = current_edge_data.travel_mode;
             m_facility_list[i] = current_edge_data.facility;
@@ -249,6 +254,24 @@ template <class EdgeDataT> class InternalDataFacade : public BaseDataFacade<Edge
         towns_stream.close();
     }
 
+    void LoadBikeRoutes(const boost::filesystem::path &bike_routes_file)
+    {
+        boost::filesystem::ifstream bike_routes_stream(bike_routes_file, std::ios::binary);
+
+        bike_routes_stream >> m_bike_routes_table;
+
+        unsigned number_of_chars = 0;
+        bike_routes_stream.read((char *)&number_of_chars, sizeof(unsigned));
+        BOOST_ASSERT_MSG(0 != number_of_chars, "bike routes file broken");
+        m_bike_routes_char_list.resize(number_of_chars + 1); //+1 gives sentinel element
+        bike_routes_stream.read((char *)&m_bike_routes_char_list[0], number_of_chars * sizeof(char));
+        if (0 == m_bike_routes_char_list.size())
+        {
+            SimpleLogger().Write(logWARNING) << "list of bike routes is empty";
+        }
+        bike_routes_stream.close();
+    }
+
   public:
     virtual ~InternalDataFacade()
     {
@@ -291,6 +314,10 @@ template <class EdgeDataT> class InternalDataFacade : public BaseDataFacade<Edge
         {
             throw osrm::exception("no towns file given in ini file");
         }
+        if (server_paths.find("bikeroutesdata") == server_paths.end())
+        {
+            throw osrm::exception("no bike routes file given in ini file");
+        }
 
         ServerPaths::const_iterator paths_iterator = server_paths.find("hsgrdata");
         BOOST_ASSERT(server_paths.end() != paths_iterator);
@@ -316,6 +343,9 @@ template <class EdgeDataT> class InternalDataFacade : public BaseDataFacade<Edge
         paths_iterator = server_paths.find("townsdata");
         BOOST_ASSERT(server_paths.end() != paths_iterator);
         const boost::filesystem::path &towns_data_path = paths_iterator->second;
+        paths_iterator = server_paths.find("bikeroutesdata");
+        BOOST_ASSERT(server_paths.end() != paths_iterator);
+        const boost::filesystem::path &bike_routes_data_path = paths_iterator->second;
         paths_iterator = server_paths.find("geometries");
         BOOST_ASSERT(server_paths.end() != paths_iterator);
         const boost::filesystem::path &geometries_path = paths_iterator->second;
@@ -340,6 +370,7 @@ template <class EdgeDataT> class InternalDataFacade : public BaseDataFacade<Edge
         AssertPathExists(names_data_path);
         LoadStreetNames(names_data_path);
         LoadStreetTowns(towns_data_path);
+        LoadBikeRoutes(bike_routes_data_path);
     }
 
     // search graph access
@@ -492,6 +523,30 @@ template <class EdgeDataT> class InternalDataFacade : public BaseDataFacade<Edge
             result.resize(range.back() - range.front() + 1);
             std::copy(m_towns_char_list.begin() + range.front(),
                       m_towns_char_list.begin() + range.back() + 1,
+                      result.begin());
+        }
+    }
+
+    unsigned GetBikeRoutesIndexFromEdgeID(const unsigned id) const final
+    {
+        return m_bike_routes_ID_list.at(id);
+    };
+
+    void GetBikeRoutes(const unsigned bike_routes_id, std::string &result) const final
+    {
+        if (UINT_MAX == bike_routes_id)
+        {
+            result = "";
+            return;
+        }
+        auto range = m_bike_routes_table.GetRange(bike_routes_id);
+
+        result.clear();
+        if (range.begin() != range.end())
+        {
+            result.resize(range.back() - range.front() + 1);
+            std::copy(m_bike_routes_char_list.begin() + range.front(),
+                      m_bike_routes_char_list.begin() + range.back() + 1,
                       result.begin());
         }
     }

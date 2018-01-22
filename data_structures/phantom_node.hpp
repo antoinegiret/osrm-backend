@@ -42,6 +42,7 @@ struct PhantomNode
                 NodeID reverse_node_id,
                 unsigned name_id,
                 unsigned towns_id,
+                unsigned bike_routes_id,
                 int forward_weight,
                 int reverse_weight,
                 int forward_offset,
@@ -61,6 +62,7 @@ struct PhantomNode
     NodeID reverse_node_id;
     unsigned name_id;
     unsigned towns_id;
+    unsigned bike_routes_id;
     int forward_weight;
     int reverse_weight;
     int forward_offset;
@@ -119,18 +121,19 @@ inline std::ostream& operator<<(std::ostream &out, const PhantomNodes & pn)
 
 inline std::ostream& operator<<(std::ostream &out, const PhantomNode & pn)
 {
-    out <<  "node1: " << pn.forward_node_id      << ", " <<
-            "node2: " << pn.reverse_node_id      << ", " <<
-            "name: "  << pn.name_id              << ", " <<
-            "towns: " << pn.towns_id             << ", " <<
-            "fwd-w: " << pn.forward_weight       << ", " <<
-            "rev-w: " << pn.reverse_weight       << ", " <<
-            "fwd-o: " << pn.forward_offset       << ", " <<
-            "rev-o: " << pn.reverse_offset       << ", " <<
-            "geom: "  << pn.packed_geometry_id   << ", " <<
-            "comp: "  << pn.component_id         << ", " <<
-            "pos: "   << pn.fwd_segment_position << ", " <<
-            "loc: "   << pn.location;
+    out <<  "node1: "       << pn.forward_node_id      << ", " <<
+            "node2: "       << pn.reverse_node_id      << ", " <<
+            "name: "        << pn.name_id              << ", " <<
+            "bike-routes: " << pn.bike_routes_id       << ", " <<
+            "towns: "       << pn.towns_id             << ", " <<
+            "fwd-w: "       << pn.forward_weight       << ", " <<
+            "rev-w: "       << pn.reverse_weight       << ", " <<
+            "fwd-o: "       << pn.forward_offset       << ", " <<
+            "rev-o: "       << pn.reverse_offset       << ", " <<
+            "geom: "        << pn.packed_geometry_id   << ", " <<
+            "comp: "        << pn.component_id         << ", " <<
+            "pos: "         << pn.fwd_segment_position << ", " <<
+            "loc: "         << pn.location;
     return out;
 }
 

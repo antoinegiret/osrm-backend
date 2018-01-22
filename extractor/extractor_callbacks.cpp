@@ -44,8 +44,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ExtractorCallbacks::ExtractorCallbacks(ExtractionContainers &extraction_containers,
                                        std::unordered_map<std::string, NodeID> &string_map,
                                        std::unordered_map<std::string, NodeID> &towns_map,
-                                       std::unordered_map<NodeID, FixedPointCoordinate> &coordinates_map)
-    : string_map(string_map), towns_map(towns_map), coordinates_map(coordinates_map), external_memory(extraction_containers)
+                                       std::unordered_map<std::string, NodeID> &bike_routes_map,
+                                       std::unordered_map<NodeID, FixedPointCoordinate> &coordinates_map) :
+        string_map(string_map),
+        towns_map(towns_map),
+        bike_routes_map(bike_routes_map),
+        coordinates_map(coordinates_map),
+        external_memory(extraction_containers)
 {
 }
 
@@ -146,6 +151,19 @@ void ExtractorCallbacks::ProcessWay(const osmium::Way &input_way, const Extracti
         towns_id = towns_map_iterator->second;
     }
 
+    // Get the unique identifier for the bike routes
+    const auto &bike_routes_map_iterator = bike_routes_map.find(parsed_way.bike_routes);
+    unsigned bike_routes_id = external_memory.bike_routes_list.size();
+    if (bike_routes_map.end() == bike_routes_map_iterator)
+    {
+        external_memory.bike_routes_list.push_back(parsed_way.bike_routes);
+        bike_routes_map.insert(std::make_pair(parsed_way.bike_routes, bike_routes_id));
+    }
+    else
+    {
+        bike_routes_id = bike_routes_map_iterator->second;
+    }
+
     const bool split_edge = (parsed_way.forward_speed > 0) &&
                             (TRAVEL_MODE_INACCESSIBLE != parsed_way.forward_travel_mode) &&
                             (parsed_way.backward_speed > 0) &&
@@ -168,6 +186,7 @@ void ExtractorCallbacks::ProcessWay(const osmium::Way &input_way, const Extracti
             parsed_way.forward_speed * slope_ratio,
             name_id,
             towns_id,
+            bike_routes_id,
             parsed_way.roundabout,
             parsed_way.ignore_in_grid,
             (0 < parsed_way.duration),
@@ -224,6 +243,7 @@ void ExtractorCallbacks::ProcessWay(const osmium::Way &input_way, const Extracti
                                       parsed_way.backward_speed * slope_ratio,
                                       name_id,
                                       towns_id,
+                                      bike_routes_id,
                                       parsed_way.roundabout,
                                       parsed_way.ignore_in_grid,
                                       (0 < parsed_way.duration),

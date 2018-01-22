@@ -50,6 +50,7 @@ ExtractionContainers::ExtractionContainers()
     stxxl::vector<unsigned> dummy_vector;
     name_list.push_back("");
     towns_list.push_back("");
+    bike_routes_list.push_back("");
 }
 
 ExtractionContainers::~ExtractionContainers()
@@ -59,6 +60,7 @@ ExtractionContainers::~ExtractionContainers()
     all_edges_list.clear();
     name_list.clear();
     towns_list.clear();
+    bike_routes_list.clear();
     restrictions_list.clear();
     way_start_end_id_list.clear();
 }
@@ -382,6 +384,7 @@ void ExtractionContainers::PrepareData(const std::string &output_file_name,
                 file_out_stream.write((char *)&integer_weight, sizeof(int));
                 file_out_stream.write((char *)&edge_iterator->name_id, sizeof(unsigned));
                 file_out_stream.write((char *)&edge_iterator->towns_id, sizeof(unsigned));
+                file_out_stream.write((char *)&edge_iterator->bike_routes_id, sizeof(unsigned));
                 file_out_stream.write((char *)&edge_iterator->is_roundabout, sizeof(bool));
                 file_out_stream.write((char *)&edge_iterator->is_in_tiny_cc, sizeof(bool));
                 file_out_stream.write((char *)&edge_iterator->is_access_restricted, sizeof(bool));
@@ -466,6 +469,35 @@ void ExtractionContainers::PrepareData(const std::string &output_file_name,
         towns_file_stream.close();
         TIMER_STOP(write_towns_index);
         std::cout << "ok, after " << TIMER_SEC(write_towns_index) << "s" << std::endl;
+
+        std::cout << "[extractor] writing bike routes index ... " << std::flush;
+        TIMER_START(write_bike_routes_index);
+        std::string bike_routes_file_streamName = (output_file_name + ".bikeroutes");
+        boost::filesystem::ofstream bike_routes_file_stream(bike_routes_file_streamName, std::ios::binary);
+
+        total_length = 0;
+        std::vector<unsigned> bike_routes_lengths;
+        for (const std::string &temp_string : bike_routes_list)
+        {
+            const unsigned string_length = std::min(static_cast<unsigned>(temp_string.length()), 255u);
+            bike_routes_lengths.push_back(string_length);
+            total_length += string_length;
+        }
+
+        RangeTable<> bike_routes_table(bike_routes_lengths);
+        bike_routes_file_stream << bike_routes_table;
+
+        bike_routes_file_stream.write((char*) &total_length, sizeof(unsigned));
+        // write all chars consecutively
+        for (const std::string &temp_string : bike_routes_list)
+        {
+            const unsigned string_length = std::min(static_cast<unsigned>(temp_string.length()), 255u);
+            bike_routes_file_stream.write(temp_string.c_str(), string_length);
+        }
+
+        bike_routes_file_stream.close();
+        TIMER_STOP(write_bike_routes_index);
+        std::cout << "ok, after " << TIMER_SEC(write_bike_routes_index) << "s" << std::endl;
 
         SimpleLogger().Write() << "Processed " << number_of_used_nodes << " nodes and "
                                << number_of_used_edges << " edges";

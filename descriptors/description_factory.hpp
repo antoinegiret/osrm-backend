@@ -67,7 +67,15 @@ class DescriptionFactory
         EdgeWeight duration;
         unsigned source_name_id;
         unsigned target_name_id;
-        RouteSummary() : distance(0), duration(0), source_name_id(0), target_name_id(0) {}
+        unsigned source_bike_routes_id;
+        unsigned target_bike_routes_id;
+        RouteSummary() :
+                distance(0),
+                duration(0),
+                source_name_id(0),
+                target_name_id(0),
+                source_bike_routes_id(0),
+                target_bike_routes_id(0) {}
 
         void BuildDurationAndLengthStrings(const double raw_distance, const unsigned raw_duration)
         {
@@ -108,6 +116,7 @@ class DescriptionFactory
             // move down names by one, q&d hack
             path_description[i - 1].name_id = path_description[i].name_id;
             path_description[i - 1].towns_id = path_description[i].towns_id;
+            path_description[i - 1].bike_routes_id = path_description[i].bike_routes_id;
             path_description[i].length = FixedPointCoordinate::ApproximateEuclideanDistance(
                 path_description[i - 1].location, path_description[i].location);
         }
@@ -186,6 +195,7 @@ class DescriptionFactory
                 path_description.back().turn_instruction = TurnInstruction::NoTurn;
                 target_phantom.name_id = (path_description.end() - 2)->name_id;
                 target_phantom.towns_id = (path_description.end() - 2)->towns_id;
+                target_phantom.bike_routes_id = (path_description.end() - 2)->bike_routes_id;
             }
         }
         if (std::numeric_limits<double>::epsilon() > path_description.front().length)
@@ -197,6 +207,7 @@ class DescriptionFactory
                 path_description.front().necessary = true;
                 start_phantom.name_id = path_description.front().name_id;
                 start_phantom.towns_id = path_description.front().towns_id;
+                start_phantom.bike_routes_id = path_description.front().bike_routes_id;
             }
         }
 

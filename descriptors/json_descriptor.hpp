@@ -364,6 +364,7 @@ template <class DataFacadeT> class JSONDescriptor final : public BaseDescriptor<
                 {
 					std::string current_name = facade->GetEscapedNameForNameID(segment.name_id);
                     std::string current_towns = facade->GetEscapedTownsForTownsID(segment.towns_id);
+                    std::string current_bike_routes = facade->GetEscapedBikeRoutesForBikeRoutesID(segment.bike_routes_id);
                     std::string current_turn_instruction;
                     if (TurnInstruction::LeaveRoundAbout == current_instruction)
                     {
@@ -389,6 +390,7 @@ template <class DataFacadeT> class JSONDescriptor final : public BaseDescriptor<
                         json_tmp_instruction_row.values.push_back(0.);
                         json_tmp_instruction_row.values.push_back(1);
                         json_tmp_instruction_row.values.push_back(1);
+                        json_tmp_instruction_row.values.push_back("");
                         json_tmp_instruction_row.values.push_back("");
                         json_instruction_array.values.push_back(json_tmp_instruction_row);
 
@@ -417,6 +419,7 @@ template <class DataFacadeT> class JSONDescriptor final : public BaseDescriptor<
                     json_instruction_row.values.push_back(segment.facility);
 
                     json_instruction_row.values.push_back(current_towns);
+                    json_instruction_row.values.push_back(current_bike_routes);
 
                     route_segments_list.emplace_back(
                         segment.name_id,
@@ -447,6 +450,7 @@ template <class DataFacadeT> class JSONDescriptor final : public BaseDescriptor<
         json_last_instruction_row.values.push_back(0.);
         json_last_instruction_row.values.push_back(1);
         json_last_instruction_row.values.push_back(1);
+        json_last_instruction_row.values.push_back("");
         json_last_instruction_row.values.push_back("");
         json_instruction_array.values.push_back(json_last_instruction_row);
     }

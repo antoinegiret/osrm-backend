@@ -49,7 +49,14 @@ void DescriptionFactory::SetStartSegment(const PhantomNode &source, const bool t
         (traversed_in_reverse ? source.backward_facility : source.forward_facility);
     AppendSegment(
         source.location,
-        PathData(0, source.name_id, source.towns_id, TurnInstruction::HeadOn, segment_duration, travel_mode, facility));
+        PathData(0,
+                 source.name_id,
+                 source.towns_id,
+                 source.bike_routes_id,
+                 TurnInstruction::HeadOn,
+                 segment_duration,
+                 travel_mode,
+                 facility));
     BOOST_ASSERT(path_description.back().duration == segment_duration);
 }
 
@@ -67,6 +74,7 @@ void DescriptionFactory::SetEndSegment(const PhantomNode &target,
     path_description.emplace_back(target.location,
                                   target.name_id,
                                   target.towns_id,
+                                  target.bike_routes_id,
                                   segment_duration,
                                   0.f,
                                   is_via_location ? TurnInstruction::ReachViaLocation
@@ -89,6 +97,7 @@ void DescriptionFactory::AppendSegment(const FixedPointCoordinate &coordinate,
         {
             path_description.front().name_id = path_point.name_id;
             path_description.front().towns_id = path_point.towns_id;
+            path_description.front().bike_routes_id = path_point.bike_routes_id;
             path_description.front().travel_mode = path_point.travel_mode;
             path_description.front().facility = path_point.facility;
         }
@@ -110,6 +119,7 @@ void DescriptionFactory::AppendSegment(const FixedPointCoordinate &coordinate,
     path_description.emplace_back(coordinate,
                                   path_point.name_id,
                                   path_point.towns_id,
+                                  path_point.bike_routes_id,
                                   path_point.segment_duration,
                                   0.f,
                                   turn,
@@ -130,5 +140,7 @@ void DescriptionFactory::BuildRouteSummary(const double distance, const unsigned
 {
     summary.source_name_id = start_phantom.name_id;
     summary.target_name_id = target_phantom.name_id;
+    summary.source_bike_routes_id = start_phantom.bike_routes_id;
+    summary.target_bike_routes_id = target_phantom.bike_routes_id;
     summary.BuildDurationAndLengthStrings(distance, time);
 }

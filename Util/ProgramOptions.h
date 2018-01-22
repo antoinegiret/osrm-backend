@@ -72,6 +72,8 @@ inline void populate_base_path(ServerPaths &server_paths)
         BOOST_ASSERT(server_paths.find("namesdata") != server_paths.end());
         server_paths["townsdata"] = base_string + ".towns";
         BOOST_ASSERT(server_paths.find("townsdata") != server_paths.end());
+        server_paths["bikeroutesdata"] = base_string + ".bikeroutes";
+        BOOST_ASSERT(server_paths.find("bikeroutesdata") != server_paths.end());
         server_paths["timestamp"] = base_string + ".timestamp";
         BOOST_ASSERT(server_paths.find("timestamp") != server_paths.end());
     }
@@ -142,6 +144,13 @@ inline void populate_base_path(ServerPaths &server_paths)
         throw osrm::exception(".townsIndex not found");
     }
 
+    path_iterator = server_paths.find("bikeroutesdata");
+    if (path_iterator == server_paths.end() ||
+        !boost::filesystem::is_regular_file(path_iterator->second))
+    {
+        throw osrm::exception(".bikeRoutesIndex not found");
+    }
+
     SimpleLogger().Write() << "HSGR file:\t" << server_paths["hsgrdata"];
     SimpleLogger().Write(logDEBUG) << "Nodes file:\t" << server_paths["nodesdata"];
     SimpleLogger().Write(logDEBUG) << "Edges file:\t" << server_paths["edgesdata"];
@@ -150,6 +159,7 @@ inline void populate_base_path(ServerPaths &server_paths)
     SimpleLogger().Write(logDEBUG) << "Index file:\t" << server_paths["fileindex"];
     SimpleLogger().Write(logDEBUG) << "Names file:\t" << server_paths["namesdata"];
     SimpleLogger().Write(logDEBUG) << "Towns file:\t" << server_paths["townsdata"];
+    SimpleLogger().Write(logDEBUG) << "Bike routes file:\t" << server_paths["bikeroutesdata"];
     SimpleLogger().Write(logDEBUG) << "Timestamp file:\t" << server_paths["timestamp"];
 }
 
@@ -197,11 +207,15 @@ inline unsigned GenerateServerProgramOptions(const int argc,
         "namesdata",
         boost::program_options::value<boost::filesystem::path>(&paths["namesdata"]),
         ".names file")(
-            "townsdata",
-            boost::program_options::value<boost::filesystem::path>(&paths["townsdata"]),
-            ".towns file")("timestamp",
-                       boost::program_options::value<boost::filesystem::path>(&paths["timestamp"]),
-                       ".timestamp file")(
+        "townsdata",
+        boost::program_options::value<boost::filesystem::path>(&paths["townsdata"]),
+        ".towns file")(
+        "bikeroutesdata",
+        boost::program_options::value<boost::filesystem::path>(&paths["bikeroutesdata"]),
+        ".bikeroutes file")(
+        "timestamp",
+        boost::program_options::value<boost::filesystem::path>(&paths["timestamp"]),
+        ".timestamp file")(
         "ip,i",
         boost::program_options::value<std::string>(&ip_address)->default_value("0.0.0.0"),
         "IP address")(

@@ -41,7 +41,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 struct PathData
 {
     PathData()
-        : node(SPECIAL_NODEID), name_id(INVALID_EDGE_WEIGHT), towns_id(INVALID_EDGE_WEIGHT),
+        : node(SPECIAL_NODEID), name_id(INVALID_EDGE_WEIGHT), towns_id(INVALID_EDGE_WEIGHT), bike_routes_id(INVALID_EDGE_WEIGHT),
           segment_duration(INVALID_EDGE_WEIGHT),
           turn_instruction(TurnInstruction::NoTurn),
           travel_mode(TRAVEL_MODE_INACCESSIBLE),
@@ -52,17 +52,20 @@ struct PathData
     PathData(NodeID node,
              unsigned name_id,
              unsigned towns_id,
+             unsigned bike_routes_id,
              TurnInstruction turn_instruction,
              EdgeWeight segment_duration,
              TravelMode travel_mode,
              Facility facility)
-        : node(node), name_id(name_id), towns_id(towns_id), segment_duration(segment_duration), turn_instruction(turn_instruction),
+        : node(node), name_id(name_id), towns_id(towns_id), bike_routes_id(bike_routes_id),
+          segment_duration(segment_duration), turn_instruction(turn_instruction),
           travel_mode(travel_mode), facility(facility)
     {
     }
     NodeID node;
     unsigned name_id;
     unsigned towns_id;
+    unsigned bike_routes_id;
     EdgeWeight segment_duration;
     TurnInstruction turn_instruction;
     TravelMode travel_mode : 4;

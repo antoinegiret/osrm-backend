@@ -76,11 +76,15 @@ bool GenerateDataStoreOptions(const int argc, const char *argv[], ServerPaths &p
         "namesdata",
         boost::program_options::value<boost::filesystem::path>(&paths["namesdata"]),
         ".names file")(
-            "townsdata",
-            boost::program_options::value<boost::filesystem::path>(&paths["townsdata"]),
-            ".towns file")("timestamp",
-                       boost::program_options::value<boost::filesystem::path>(&paths["timestamp"]),
-                       ".timestamp file");
+        "townsdata",
+        boost::program_options::value<boost::filesystem::path>(&paths["townsdata"]),
+        ".towns file")(
+        "bikeroutesdata",
+        boost::program_options::value<boost::filesystem::path>(&paths["bikeroutesdata"]),
+        ".bikeroutes file")(
+        "timestamp",
+        boost::program_options::value<boost::filesystem::path>(&paths["timestamp"]),
+        ".timestamp file");
 
     // hidden options, will be allowed both on command line and in config
     // file, but will not be shown to the user
@@ -220,6 +224,12 @@ bool GenerateDataStoreOptions(const int argc, const char *argv[], ServerPaths &p
             path_iterator->second = base_string + ".towns";
         }
 
+        path_iterator = paths.find("bikeroutesdata");
+        if (path_iterator != paths.end())
+        {
+            path_iterator->second = base_string + ".bikeroutes";
+        }
+
         path_iterator = paths.find("timestamp");
         if (path_iterator != paths.end())
         {
@@ -280,6 +290,13 @@ bool GenerateDataStoreOptions(const int argc, const char *argv[], ServerPaths &p
     if (path_iterator == paths.end() || path_iterator->second.string().empty())
     {
         throw osrm::exception(".towns file must be specified");
+    }
+    AssertPathExists(path_iterator->second);
+
+    path_iterator = paths.find("bikeroutesdata");
+    if (path_iterator == paths.end() || path_iterator->second.string().empty())
+    {
+        throw osrm::exception(".bikeroutes file must be specified");
     }
     AssertPathExists(path_iterator->second);
 

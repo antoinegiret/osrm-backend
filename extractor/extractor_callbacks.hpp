@@ -49,6 +49,7 @@ class ExtractorCallbacks
   private:
     std::unordered_map<std::string, NodeID> &string_map;
     std::unordered_map<std::string, NodeID> &towns_map;
+    std::unordered_map<std::string, NodeID> &bike_routes_map;
     std::unordered_map<NodeID, FixedPointCoordinate> &coordinates_map;
     ExtractionContainers &external_memory;
 
@@ -58,6 +59,7 @@ class ExtractorCallbacks
     explicit ExtractorCallbacks(ExtractionContainers &extraction_containers,
                                 std::unordered_map<std::string, NodeID> &string_map,
                                 std::unordered_map<std::string, NodeID> &towns_map,
+                                std::unordered_map<std::string, NodeID> &bike_routes_map,
                                 std::unordered_map<NodeID, FixedPointCoordinate> &coordinates_map);
 
     // warning: caller needs to take care of synchronization!

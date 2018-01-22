@@ -160,6 +160,10 @@ int main(const int argc, const char *argv[])
         {
             throw osrm::exception("no towns file found");
         }
+        if (server_paths.find("bikeroutesdata") == server_paths.end())
+        {
+            throw osrm::exception("no bike routes file found");
+        }
         if (server_paths.find("geometry") == server_paths.end())
         {
             throw osrm::exception("no geometry file found");
@@ -199,6 +203,10 @@ int main(const int argc, const char *argv[])
         BOOST_ASSERT(server_paths.end() != paths_iterator);
         BOOST_ASSERT(!paths_iterator->second.empty());
         const boost::filesystem::path &towns_data_path = paths_iterator->second;
+        paths_iterator = server_paths.find("bikeroutesdata");
+        BOOST_ASSERT(server_paths.end() != paths_iterator);
+        BOOST_ASSERT(!paths_iterator->second.empty());
+        const boost::filesystem::path &bike_routes_data_path = paths_iterator->second;
         paths_iterator = server_paths.find("geometry");
         BOOST_ASSERT(server_paths.end() != paths_iterator);
         BOOST_ASSERT(!paths_iterator->second.empty());
@@ -264,6 +272,22 @@ int main(const int argc, const char *argv[])
         towns_stream.read((char *)&number_of_chars, sizeof(unsigned));
         shared_layout_ptr->SetBlockSize<char>(SharedDataLayout::TOWNS_CHAR_LIST, number_of_chars);
 
+        // collect number of elements to store in shared memory object
+        SimpleLogger().Write() << "load bike routes from: " << bike_routes_data_path;
+        // number of entries in bike routes index
+        boost::filesystem::ifstream bike_routes_stream(bike_routes_data_path, std::ios::binary);
+        unsigned bike_routes_blocks = 0;
+        bike_routes_stream.read((char *)&bike_routes_blocks, sizeof(unsigned));
+        shared_layout_ptr->SetBlockSize<unsigned>(SharedDataLayout::BIKE_ROUTES_OFFSETS, bike_routes_blocks);
+        shared_layout_ptr->SetBlockSize<typename RangeTable<16, true>::BlockT>(
+                SharedDataLayout::BIKE_ROUTES_BLOCKS, bike_routes_blocks);
+        SimpleLogger().Write() << "bike_routes offsets size: " << bike_routes_blocks;
+        BOOST_ASSERT_MSG(0 != bike_routes_blocks, "bike routes file broken");
+
+        number_of_chars = 0;
+        bike_routes_stream.read((char *)&number_of_chars, sizeof(unsigned));
+        shared_layout_ptr->SetBlockSize<char>(SharedDataLayout::BIKE_ROUTES_CHAR_LIST, number_of_chars);
+
         // Loading information for original edges
         boost::filesystem::ifstream edges_input_stream(edges_data_path, std::ios::binary);
         unsigned number_of_original_edges = 0;
@@ -275,6 +299,8 @@ int main(const int argc, const char *argv[])
         shared_layout_ptr->SetBlockSize<unsigned>(SharedDataLayout::NAME_ID_LIST,
                                                   number_of_original_edges);
         shared_layout_ptr->SetBlockSize<unsigned>(SharedDataLayout::TOWNS_ID_LIST,
+                                                  number_of_original_edges);
+        shared_layout_ptr->SetBlockSize<unsigned>(SharedDataLayout::BIKE_ROUTES_ID_LIST,
                                                   number_of_original_edges);
         shared_layout_ptr->SetBlockSize<TravelMode>(SharedDataLayout::TRAVEL_MODE,
                                                     number_of_original_edges);
@@ -462,6 +488,39 @@ int main(const int argc, const char *argv[])
 
         towns_stream.close();
 
+        // Loading bike routes
+        unsigned *bike_routes_offsets_ptr = shared_layout_ptr->GetBlockPtr<unsigned, true>(
+                shared_memory_ptr, SharedDataLayout::BIKE_ROUTES_OFFSETS);
+        if (shared_layout_ptr->GetBlockSize(SharedDataLayout::BIKE_ROUTES_OFFSETS) > 0)
+        {
+            bike_routes_stream.read((char *)bike_routes_offsets_ptr,
+                              shared_layout_ptr->GetBlockSize(SharedDataLayout::BIKE_ROUTES_OFFSETS));
+        }
+
+        unsigned *bike_routes_blocks_ptr = shared_layout_ptr->GetBlockPtr<unsigned, true>(
+                shared_memory_ptr, SharedDataLayout::BIKE_ROUTES_BLOCKS);
+        if (shared_layout_ptr->GetBlockSize(SharedDataLayout::BIKE_ROUTES_BLOCKS) > 0)
+        {
+            bike_routes_stream.read((char *)bike_routes_blocks_ptr,
+                              shared_layout_ptr->GetBlockSize(SharedDataLayout::BIKE_ROUTES_BLOCKS));
+        }
+
+        char *bike_routes_char_ptr = shared_layout_ptr->GetBlockPtr<char, true>(
+                shared_memory_ptr, SharedDataLayout::BIKE_ROUTES_CHAR_LIST);
+        bike_routes_stream.read((char *)&temp_length, sizeof(unsigned));
+
+        BOOST_ASSERT_MSG(temp_length ==
+                         shared_layout_ptr->GetBlockSize(SharedDataLayout::BIKE_ROUTES_CHAR_LIST),
+                         "Bike routes file corrupted!");
+
+        if (shared_layout_ptr->GetBlockSize(SharedDataLayout::BIKE_ROUTES_CHAR_LIST) > 0)
+        {
+            bike_routes_stream.read(bike_routes_char_ptr,
+                              shared_layout_ptr->GetBlockSize(SharedDataLayout::BIKE_ROUTES_CHAR_LIST));
+        }
+
+        bike_routes_stream.close();
+
         // load original edge information
         NodeID *via_node_ptr = shared_layout_ptr->GetBlockPtr<NodeID, true>(
             shared_memory_ptr, SharedDataLayout::VIA_NODE_LIST);
@@ -471,6 +530,9 @@ int main(const int argc, const char *argv[])
 
         unsigned *towns_id_ptr = shared_layout_ptr->GetBlockPtr<unsigned, true>(
                 shared_memory_ptr, SharedDataLayout::TOWNS_ID_LIST);
+
+        unsigned *bike_routes_id_ptr = shared_layout_ptr->GetBlockPtr<unsigned, true>(
+                shared_memory_ptr, SharedDataLayout::BIKE_ROUTES_ID_LIST);
 
         TravelMode *travel_mode_ptr =
             shared_layout_ptr->GetBlockPtr<TravelMode, true>(
@@ -490,6 +552,7 @@ int main(const int argc, const char *argv[])
             via_node_ptr[i] = current_edge_data.via_node;
             name_id_ptr[i] = current_edge_data.name_id;
             towns_id_ptr[i] = current_edge_data.towns_id;
+            bike_routes_id_ptr[i] = current_edge_data.bike_routes_id;
             travel_mode_ptr[i] = current_edge_data.travel_mode;
             turn_instructions_ptr[i] = current_edge_data.turn_instruction;
 

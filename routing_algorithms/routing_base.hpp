@@ -226,6 +226,7 @@ template <class DataFacadeT> class BasicRoutingInterface
                 BOOST_ASSERT_MSG(!ed.shortcut, "original edge flagged as shortcut");
                 unsigned name_index = facade->GetNameIndexFromEdgeID(ed.id);
                 unsigned towns_index = facade->GetTownsIndexFromEdgeID(ed.id);
+                unsigned bike_routes_index = facade->GetBikeRoutesIndexFromEdgeID(ed.id);
                 const TurnInstruction turn_instruction = facade->GetTurnInstructionForEdgeID(ed.id);
                 const TravelMode travel_mode = facade->GetTravelModeForEdgeID(ed.id);
                 const Facility facility = facade->GetFacilityForEdgeID(ed.id);
@@ -236,6 +237,7 @@ template <class DataFacadeT> class BasicRoutingInterface
                     unpacked_path.emplace_back(facade->GetGeometryIndexForEdgeID(ed.id),
                                                name_index,
                                                towns_index,
+                                               bike_routes_index,
                                                turn_instruction,
                                                ed.distance,
                                                travel_mode,
@@ -260,7 +262,14 @@ template <class DataFacadeT> class BasicRoutingInterface
                     BOOST_ASSERT(start_index <= end_index);
                     for (std::size_t i = start_index; i < end_index; ++i)
                     {
-                        unpacked_path.emplace_back(id_vector[i], name_index, towns_index, TurnInstruction::NoTurn, 0, travel_mode, facility);
+                        unpacked_path.emplace_back(id_vector[i],
+                                                   name_index,
+                                                   towns_index,
+                                                   bike_routes_index,
+                                                   TurnInstruction::NoTurn,
+                                                   0,
+                                                   travel_mode,
+                                                   facility);
                     }
                     unpacked_path.back().turn_instruction = turn_instruction;
                     unpacked_path.back().segment_duration = ed.distance;
@@ -307,6 +316,7 @@ template <class DataFacadeT> class BasicRoutingInterface
                 unpacked_path.emplace_back(PathData{id_vector[i],
                                                     phantom_node_pair.target_phantom.name_id,
                                                     phantom_node_pair.target_phantom.towns_id,
+                                                    phantom_node_pair.target_phantom.bike_routes_id,
                                                     TurnInstruction::NoTurn,
                                                     0,
                                                     phantom_node_pair.target_phantom.forward_travel_mode,

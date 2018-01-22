@@ -140,6 +140,7 @@ NodeID readBinaryOSRMGraphFromStream(std::istream &input_stream,
     NodeID source, target;
     unsigned nameID;
     unsigned townsID;
+    unsigned bikeRoutesID;
     int length;
     short dir; // direction (0 = open, 1 = forward, 2+ = open)
     bool is_roundabout, ignore_in_grid, is_access_restricted, is_split;
@@ -160,6 +161,7 @@ NodeID readBinaryOSRMGraphFromStream(std::istream &input_stream,
         input_stream.read((char *)&weight, sizeof(int));
         input_stream.read((char *)&nameID, sizeof(unsigned));
         input_stream.read((char *)&townsID, sizeof(unsigned));
+        input_stream.read((char *)&bikeRoutesID, sizeof(unsigned));
         input_stream.read((char *)&is_roundabout, sizeof(bool));
         input_stream.read((char *)&ignore_in_grid, sizeof(bool));
         input_stream.read((char *)&is_access_restricted, sizeof(bool));
@@ -214,6 +216,7 @@ NodeID readBinaryOSRMGraphFromStream(std::istream &input_stream,
                                target,
                                nameID,
                                townsID,
+                               bikeRoutesID,
                                weight,
                                forward,
                                backward,

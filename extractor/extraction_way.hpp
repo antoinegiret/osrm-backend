@@ -49,6 +49,7 @@ struct ExtractionWay
         ignore_in_grid = false;
         name.clear();
         towns.clear();
+        bike_routes.clear();
         forward_travel_mode = TRAVEL_MODE_DEFAULT;
         backward_travel_mode = TRAVEL_MODE_DEFAULT;
         forward_facility = FACILITY_NONE;
@@ -120,6 +121,7 @@ struct ExtractionWay
     double duration;
     std::string name;
     std::string towns;
+    std::string bike_routes;
     bool roundabout;
     bool is_access_restricted;
     bool ignore_in_grid;
