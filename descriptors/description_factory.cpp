@@ -108,7 +108,9 @@ void DescriptionFactory::AppendSegment(const FixedPointCoordinate &coordinate,
     const TurnInstruction turn = [&]() -> TurnInstruction
     {
         if (TurnInstruction::NoTurn == path_point.turn_instruction &&
-            (path_description.front().travel_mode != path_point.travel_mode || path_description[path_description.size() - 2].facility != path_point.facility) &&
+            (path_description.front().travel_mode != path_point.travel_mode ||
+	     	path_description.front().facility != path_point.facility ||
+	    	    path_description.front().bike_routes_id != path_point.bike_routes_id) &&
             path_point.segment_duration > 0)
         {
             return TurnInstruction::GoStraight;
