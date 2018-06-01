@@ -505,7 +505,7 @@ template <class DataFacadeT> class JSONDescriptor final : public BaseDescriptor<
 		
 		JSON::Array json_last_elevation_row;
 		json_last_elevation_row.values.push_back(round(description_factory.get_entire_length()));
-		json_last_elevation_row.values.push_back(target_ele);
+		json_last_elevation_row.values.push_back(isnan(target_ele) ? last_valid_ele : target_ele);
 		json_last_elevation_row.values.push_back(necessary_segments_running_index - 1);
 		json_route_elevations.values.push_back(json_last_elevation_row);
 	}
