@@ -60,8 +60,11 @@ void ExtractorCallbacks::ProcessNode(const osmium::Node &input_node,
 {
 	const int lat = static_cast<int>(input_node.location().lat() * COORDINATE_PRECISION);
 	const int lon = static_cast<int>(input_node.location().lon() * COORDINATE_PRECISION);
-	const double ele = atof(input_node.tags().get_value_by_key("height"));
-	const FixedPointCoordinate coordinates(lat, lon, ele);
+    const double ele = atof(input_node.tags().get_value_by_key("ele") != nullptr ?
+        input_node.tags().get_value_by_key("ele") :
+        input_node.tags().get_value_by_key("height")
+    );
+    const FixedPointCoordinate coordinates(lat, lon, ele);
 	coordinates_map.insert(std::make_pair(static_cast<NodeID>(input_node.id()), coordinates));
 	
     external_memory.all_nodes_list.push_back({
