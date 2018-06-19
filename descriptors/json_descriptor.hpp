@@ -189,9 +189,13 @@ template <class DataFacadeT> class JSONDescriptor final : public BaseDescriptor<
         json_first_coordinate.values.push_back(
             raw_route.segment_end_coordinates.front().source_phantom.location.lon /
             COORDINATE_PRECISION);
-        json_first_coordinate.values.push_back(raw_route.segment_end_coordinates.front().source_phantom.location.ele);
-        json_via_points_array.values.push_back(json_first_coordinate);
-        for (const PhantomNodes &nodes : raw_route.segment_end_coordinates)
+	
+	const double source_ele = raw_route.segment_end_coordinates.front().source_phantom.location.ele;
+        json_first_coordinate.values.push_back(!isnan(source_ele) ? source_ele : "null");
+        
+	json_via_points_array.values.push_back(json_first_coordinate);
+        
+	for (const PhantomNodes &nodes : raw_route.segment_end_coordinates)
         {
             std::string tmp;
             JSON::Array json_coordinate;
@@ -199,8 +203,10 @@ template <class DataFacadeT> class JSONDescriptor final : public BaseDescriptor<
                                              COORDINATE_PRECISION);
             json_coordinate.values.push_back(nodes.target_phantom.location.lon /
                                              COORDINATE_PRECISION);
-			json_coordinate.values.push_back(nodes.target_phantom.location.ele);
-            json_via_points_array.values.push_back(json_coordinate);
+	    const double ele = nodes.target_phantom.location.ele;
+	    json_coordinate.values.push_back(!isnan(ele) ? ele : "null");
+            
+	    json_via_points_array.values.push_back(json_coordinate);
         }
         json_result.values["via_points"] = json_via_points_array;
 
